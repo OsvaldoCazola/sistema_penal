@@ -1,0 +1,7 @@
+export * from './auth.service';
+export * from './processo.service';
+export * from './dashboard.service';
+export * from './ia.service';
+export * from './legislacao.service';
+export * from './monitoramento.service';
+export * from './artigo-monitoramento.service';
