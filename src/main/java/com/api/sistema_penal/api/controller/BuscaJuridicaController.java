@@ -5,7 +5,9 @@ import com.api.sistema_penal.api.dto.busca.AnaliseCasoResponse;
 import com.api.sistema_penal.api.dto.busca.BuscaSemanticaRequest;
 import com.api.sistema_penal.api.dto.busca.BuscaSemanticaResponse;
 import com.api.sistema_penal.api.dto.busca.BuscaSemanticaResponse.ListaResultados;
+import com.api.sistema_penal.domain.entity.AiExplanations;
 import com.api.sistema_penal.domain.entity.CategoriaJuridica;
+import com.api.sistema_penal.domain.repository.AiExplanationsRepository;
 import com.api.sistema_penal.service.BuscaSemanticaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Controlador para busca semântica jurídica
@@ -29,6 +32,7 @@ import java.util.List;
 public class BuscaJuridicaController {
 
     private final BuscaSemanticaService service;
+    private final AiExplanationsRepository aiExplanationsRepository;
 
     /**
      * POST /api/busca/semantica
@@ -79,5 +83,35 @@ public class BuscaJuridicaController {
                 description = "Retorna todas as categorias de direito disponíveis")
     public ResponseEntity<List<CategoriaJuridica>> listarCategorias() {
         return ResponseEntity.ok(service.getCategorias());
+    }
+
+    /**
+     * GET /api/busca/explicacoes
+     * Busca explicações salvas no banco de dados
+     */
+    @GetMapping("/explicacoes")
+    @Operation(summary = "Buscar explicações da IA",
+                description = "Retorna explicações geradas pela IA para buscas anteriores")
+    public ResponseEntity<List<AiExplanations>> getExplicacoes(
+            @RequestParam(required = false) String termoBusca,
+            @RequestParam(required = false) UUID artigoId,
+            @RequestParam(required = false) UUID usuarioId,
+            @RequestParam(required = false) AiExplanations.TipoPalavra tipoPalavra) {
+        
+        List<AiExplanations> explicacoes;
+        
+        if (termoBusca != null) {
+            explicacoes = aiExplanationsRepository.findByTermoBusca(termoBusca);
+        } else if (artigoId != null) {
+            explicacoes = aiExplanationsRepository.findByArtigoId(artigoId);
+        } else if (usuarioId != null) {
+            explicacoes = aiExplanationsRepository.findByUsuarioId(usuarioId);
+        } else if (tipoPalavra != null) {
+            explicacoes = aiExplanationsRepository.findByTipoPalavra(tipoPalavra);
+        } else {
+            explicacoes = aiExplanationsRepository.findAll();
+        }
+        
+        return ResponseEntity.ok(explicacoes);
     }
 }

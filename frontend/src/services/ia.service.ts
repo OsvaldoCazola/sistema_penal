@@ -64,6 +64,22 @@ export interface PalavraArtigoMapping {
   justificativa: string;
 }
 
+/**
+ * Explicação da IA para uma palavra-chave
+ */
+export interface AiExplanation {
+  id: string;
+  termoBusca: string;
+  artigoId?: string;
+  artigoTitulo?: string;
+  palavraChave?: string;
+  tipoPalavra?: string;
+  relevancia?: number;
+  justificativa?: string;
+  createdAt?: string;
+  usuarioId?: string;
+}
+
 export interface AnaliseCasoResponse {
   descricaoAnalisada: string;
   tipoCrime: string;
@@ -199,6 +215,25 @@ class BuscaService {
     params.append('categoria', categoria);
     if (limite) params.append('limite', limite.toString());
     const response = await api.post<ListaResultados>(`/busca/relacionadas?${params.toString()}`, {});
+    return response.data;
+  }
+
+  /**
+   * Busca explicações salvas no banco de dados
+   */
+  async getExplicacoes(params: {
+    termoBusca?: string;
+    artigoId?: string;
+    usuarioId?: string;
+    tipoPalavra?: string;
+  } = {}): Promise<AiExplanation[]> {
+    const queryParams = new URLSearchParams();
+    if (params.termoBusca) queryParams.append('termoBusca', params.termoBusca);
+    if (params.artigoId) queryParams.append('artigoId', params.artigoId);
+    if (params.usuarioId) queryParams.append('usuarioId', params.usuarioId);
+    if (params.tipoPalavra) queryParams.append('tipoPalavra', params.tipoPalavra);
+    
+    const response = await api.get<AiExplanation[]>(`/busca/explicacoes?${queryParams.toString()}`);
     return response.data;
   }
 }
