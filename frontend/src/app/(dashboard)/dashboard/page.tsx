@@ -17,11 +17,11 @@ import {
   CalendarDaysIcon,
   UserGroupIcon,
   BuildingLibraryIcon,
-  UsersIcon,
   BuildingOffice2Icon,
 } from '@heroicons/react/24/outline';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Spinner } from '@/components/ui';
-import { dashboardService } from '@/services/dashboard.service';
+import { dashboardService, CrimeEstatisticas } from '@/services/dashboard.service';
 import { useAuthStore } from '@/store/auth.store';
 import { JusticeIllustration, AngolaFlag, PalancaNegra, AngolaEmblem, AngolaPattern } from '@/components/illustrations';
 import { DashboardResponse, Role } from '@/types';
@@ -43,27 +43,37 @@ function StatCard({
   subtitle?: string;
 }) {
   const colors = {
-    blue: 'from-primary-500 to-primary-600',
-    green: 'from-green-500 to-green-600',
-    yellow: 'from-amber-500 to-amber-600',
-    red: 'from-red-500 to-red-600',
-    purple: 'from-purple-500 to-purple-600',
+    blue: 'from-[#5DADE2] to-[#5DADE2]',
+    green: 'from-[#6FCF97] to-[#6FCF97]',
+    yellow: 'from-[#F7DC6F] to-[#F7DC6F]',
+    red: 'from-[#E57373] to-[#E57373]',
+    purple: 'from-[#8E44AD] to-[#8E44AD]',
+  };
+
+  const barColors = {
+    blue: 'bg-[#EAF6FD]',
+    green: 'bg-[#E8F8F0]',
+    yellow: 'bg-[#FEF7E8]',
+    red: 'bg-[#FCEDEE]',
+    purple: 'bg-[#F5E9F8]',
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-xl hover:border-primary-100 hover:-translate-y-1 transition-all duration-300 group cursor-default">
-      <div className="flex items-start justify-between mb-4">
-        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors[color]} flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+    <div className="bg-transparent rounded-[12px] p-5 border border-transparent shadow-none hover:shadow-none transition-all duration-300 group cursor-default">
+      {/* Barra colorida no topo */}
+      <div className={`h-1 ${barColors[color]} rounded-t-[12px]`} />
+      <div className="flex items-start justify-between mb-4 mt-3">
+        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors[color]} flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
           <Icon className="h-6 w-6 text-white" />
         </div>
         {trend && (
-          <div className={`flex items-center gap-1 text-sm font-medium ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
+          <div className={`flex items-center gap-1 text-sm font-medium ${trend.isPositive ? 'text-[#6FCF97]' : 'text-[#E57373]'}`}>
             <ArrowTrendingUpIcon className={`h-4 w-4 ${!trend.isPositive && 'rotate-180'}`} />
             <span>{trend.value}%</span>
           </div>
         )}
       </div>
-      <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
+      <p className="text-3xl font-bold text-[#4F4F4F] mb-1">{value}</p>
       <p className="text-sm text-gray-500">{title}</p>
       {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
     </div>
@@ -87,19 +97,19 @@ function QuickAccessCard({
   return (
     <Link 
       href={href}
-      className="group bg-white rounded-2xl p-5 border border-gray-100 hover:border-primary-200 hover:shadow-lg transition-all duration-300"
+      className="group bg-transparent rounded-[12px] p-5 border border-transparent shadow-none hover:shadow-none transition-all duration-300"
     >
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl bg-primary-50 group-hover:bg-primary-100 flex items-center justify-center transition-colors">
-          <Icon className="h-6 w-6 text-primary-600" />
+        <div className="w-12 h-12 rounded-xl bg-[#F5F6FA] group-hover:bg-[#5B5FEF]/10 flex items-center justify-center transition-colors">
+          <Icon className="h-6 w-6 text-[#5B5FEF]" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 group-hover:text-primary-700 transition-colors">
+          <h3 className="font-semibold text-[#4F4F4F] group-hover:text-[#5B5FEF] transition-colors">
             {title}
           </h3>
           <p className="text-sm text-gray-500 mt-0.5">{description}</p>
         </div>
-        <ArrowRightIcon className="h-5 w-5 text-gray-300 group-hover:text-primary-500 group-hover:translate-x-1 transition-all" />
+        <ArrowRightIcon className="h-5 w-5 text-[#7A7A7A] group-hover:text-[#5DADE2] group-hover:translate-x-1 transition-all" />
       </div>
     </Link>
   );
@@ -117,16 +127,16 @@ function ActivityCard({ activities }: { activities: Array<{ tipo: string; descri
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100">
+    <div className="bg-transparent rounded-[12px] border border-transparent shadow-none">
       <div className="px-6 py-4 border-b border-gray-100">
-        <h3 className="font-semibold text-gray-900">Actividade Recente</h3>
-        <p className="text-sm text-gray-500">Últimas movimentações no sistema</p>
+        <h3 className="font-semibold text-[#4F4F4F]">Actividade Recente</h3>
+        <p className="text-sm text-[#7A7A7A]">Últimas movimentações no sistema</p>
       </div>
       <div className="divide-y divide-gray-50">
         {activities.map((activity, idx) => (
           <div key={idx} className="px-6 py-4 hover:bg-gray-50 transition-colors">
             <div className="flex items-start gap-4">
-              <div className="w-2 h-2 rounded-full bg-primary-500 mt-2" />
+              <div className="w-2 h-2 rounded-full bg-[#5DADE2] mt-2" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900">{activity.tipo}</p>
                 <p className="text-sm text-gray-500 mt-0.5">{activity.descricao}</p>
@@ -139,7 +149,7 @@ function ActivityCard({ activities }: { activities: Array<{ tipo: string; descri
         ))}
       </div>
       <div className="px-6 py-4 border-t border-gray-100">
-        <Link href="/processos" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+        <Link href="/processos" className="text-sm text-[#5DADE2] hover:text-[#3498DB] font-medium">
           Ver todas as actividades →
         </Link>
       </div>
@@ -149,29 +159,70 @@ function ActivityCard({ activities }: { activities: Array<{ tipo: string; descri
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardResponse | null>(null);
+  const [crimeStats, setCrimeStats] = useState<CrimeEstatisticas | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [atualizacoes, setAtualizacoes] = useState<{
+    leis: Array<{ id: string; titulo: string; tipo: string; dataVigencia?: string; dataPublicacao?: string }>;
+    jurisprudencias: Array<{ id: string; titulo: string; numero: string; data: string }>;
+  }>({ leis: [], jurisprudencias: [] });
+  const [loadingAtualizacoes, setLoadingAtualizacoes] = useState(true);
   const { user } = useAuthStore();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await dashboardService.getDashboard();
-        setData(response);
+        const [dashboardData, crimeData] = await Promise.all([
+          dashboardService.getDashboard(),
+          dashboardService.getCrimeEstatisticas()
+        ]);
+        setData(dashboardData);
+        setCrimeStats(crimeData);
       } catch (error) {
         console.error('Erro ao carregar dashboard:', error);
+        // Tentar carregar apenas dashboard se crime stats falhar
+        try {
+          const dashboardData = await dashboardService.getDashboard();
+          setData(dashboardData);
+        } catch (e) {
+          console.error('Erro ao carregar dados:', e);
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
+    const fetchAtualizacoes = async () => {
+      try {
+        // Importar o axios configurado para manter os headers de autenticação
+        const api = (await import('@/lib/api')).default;
+        
+        // Buscar leis mais recentes
+        const leisResponse = await api.get('/leis?page=0&size=5&sort=dataVigencia,desc');
+        // Buscar sentenças mais recentes
+        const sentencasResponse = await api.get('/sentencas?page=0&size=5&sort=createdAt,desc');
+        
+        setAtualizacoes({
+          leis: leisResponse.data.content || [],
+          jurisprudencias: sentencasResponse.data.content || []
+        });
+      } catch (error) {
+        console.error('Erro ao carregar actualizações:', error);
+        // Mantém array vazio em caso de erro
+        setAtualizacoes({ leis: [], jurisprudencias: [] });
+      } finally {
+        setLoadingAtualizacoes(false);
+      }
+    };
+
     fetchData();
+    fetchAtualizacoes();
   }, []);
 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-96">
         <Spinner size="lg" />
-        <p className="mt-4 text-gray-500">A carregar dados...</p>
+        <p className="mt-4 text-[#7A7A7A]">A carregar dados...</p>
       </div>
     );
   }
@@ -185,15 +236,14 @@ export default function DashboardPage() {
   const quickAccess = [
     { title: 'Novo Processo', description: 'Registar um novo processo judicial', icon: ScaleIcon, href: '/processos/novo' },
     { title: 'Consultar Legislação', description: 'Pesquisar leis e artigos', icon: BookOpenIcon, href: '/legislacao' },
-    { title: 'Jurisprudência', description: 'Base de decisões judiciais', icon: ScaleIcon, href: '/jurisprudencia' },
+    { title: 'Jurisprudência', description: 'Base de decisões judiciais', icon: DocumentTextIcon, href: '/jurisprudencia' },
     { title: 'Análise de Casos IA', description: 'Buscar e analisar casos com IA', icon: SparklesIcon, href: '/busca' },
-    { title: 'Gestão de Utilizadores', description: 'Admin: gerir usuários do sistema', icon: UsersIcon, href: '/usuarios', adminOnly: true },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="bg-transparent min-h-screen p-5 md:p-6 font-sans text-[#4F4F4F] space-y-5">
       {/* Cabeçalho com boas-vindas */}
-      <div className="bg-gradient-to-r from-primary-500 via-primary-600 to-primary-500 rounded-3xl p-8 text-white relative overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <div className="bg-transparent rounded-[12px] p-6 text-[#4F4F4F] relative overflow-hidden shadow-none border border-transparent">
         {/* Padrão decorativo angolano */}
         <div className="absolute inset-0 opacity-5">
           <AngolaPattern className="w-full h-full" />
@@ -213,15 +263,15 @@ export default function DashboardPage() {
               <h1 className="text-2xl md:text-3xl font-bold mb-2">
                 Bem-vindo ao Sistema Penal
               </h1>
-              <p className="text-primary-100 text-lg">
+              <p className="text-[#7A7A7A] text-lg">
                 Plataforma de Gestão Judicial da República de Angola
               </p>
             </div>
-            <div className="hidden md:flex items-center gap-3 bg-white/10 backdrop-blur rounded-xl px-4 py-3">
-              <CalendarDaysIcon className="h-5 w-5" />
+            <div className="hidden md:flex items-center gap-3 bg-transparent rounded-[12px] border border-transparent p-3">
+              <CalendarDaysIcon className="h-5 w-5 text-[#5DADE2]" />
               <div>
-                <p className="text-xs text-primary-200">Data actual</p>
-                <p className="text-sm font-medium">
+                <p className="text-xs text-[#7A7A7A]">Data actual</p>
+                <p className="text-sm font-semibold text-[#4F4F4F]">
                   {new Date().toLocaleDateString('pt-AO', { 
                     weekday: 'short',
                     day: 'numeric', 
@@ -234,22 +284,22 @@ export default function DashboardPage() {
           </div>
 
           {/* Estatísticas rápidas no banner */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-              <p className="text-3xl font-bold">{data?.resumoGeral.totalProcessos.toLocaleString('pt-AO') || '0'}</p>
-              <p className="text-sm text-primary-200">Processos Totais</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mt-8">
+            <div className="bg-white rounded-[12px] p-4 border border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+              <p className="text-3xl font-bold text-[#4F4F4F]">{data?.resumoGeral.totalProcessos.toLocaleString('pt-AO') || '0'}</p>
+              <p className="text-sm text-[#7A7A7A]">Processos Totais</p>
             </div>
-            <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-              <p className="text-3xl font-bold">{data?.resumoGeral.processosEmAndamento.toLocaleString('pt-AO') || '0'}</p>
-              <p className="text-sm text-primary-200">Em Andamento</p>
+            <div className="bg-white rounded-[12px] p-4 border border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+              <p className="text-3xl font-bold text-[#4F4F4F]">{data?.resumoGeral.processosEmAndamento.toLocaleString('pt-AO') || '0'}</p>
+              <p className="text-sm text-[#7A7A7A]">Em Andamento</p>
             </div>
-            <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-              <p className="text-3xl font-bold">{data?.resumoGeral.processosEmAndamento.toLocaleString('pt-AO') || '0'}</p>
-              <p className="text-sm text-primary-200">Processos Activos</p>
+            <div className="bg-white rounded-[12px] p-4 border border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+              <p className="text-3xl font-bold text-[#4F4F4F]">{data?.resumoGeral.processosEmAndamento.toLocaleString('pt-AO') || '0'}</p>
+              <p className="text-sm text-[#7A7A7A]">Processos Activos</p>
             </div>
-            <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-              <p className="text-3xl font-bold">{data?.resumoGeral.totalSentencas.toLocaleString('pt-AO') || '0'}</p>
-              <p className="text-sm text-primary-200">Sentenças</p>
+            <div className="bg-white rounded-[12px] p-4 border border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+              <p className="text-3xl font-bold text-[#4F4F4F]">{data?.resumoGeral.totalSentencas.toLocaleString('pt-AO') || '0'}</p>
+              <p className="text-sm text-[#7A7A7A]">Sentenças</p>
             </div>
           </div>
         </div>
@@ -257,8 +307,8 @@ export default function DashboardPage() {
 
       {/* Cards de estatísticas detalhadas */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Indicadores Principais</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <h2 className="text-lg font-semibold text-[#4F4F4F] mb-4">Indicadores Principais</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <StatCard
             title="Processos em Andamento"
             value={data?.resumoGeral.processosEmAndamento.toLocaleString('pt-AO') || '0'}
@@ -292,8 +342,76 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Gráficos de Estatísticas de Crimes */}
+      {crimeStats && (crimeStats.crimesPorRegiao.length > 0 || crimeStats.crimesMaisSimulados.length > 0) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {/* Gráfico de Crimes por Região */}
+          <div className="bg-white rounded-[12px] border border-gray-200 p-6 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+            <h3 className="text-lg font-semibold text-[#4F4F4F] mb-4">Crimes por Região</h3>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={crimeStats.crimesPorRegiao} layout="vertical" margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                  <XAxis type="number" stroke="#7A7A7A" fontSize={12} />
+                  <YAxis type="category" dataKey="regiao" stroke="#7A7A7A" fontSize={12} width={75} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#FFFFFF', 
+                      border: '1px solid #E0E0E0', 
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                      color: '#1F2937'
+                    }}
+                    formatter={(value: number) => [`${value} processos`, 'Quantidade']}
+                  />
+                  <Bar dataKey="quantidade" fill="#5DADE2" radius={[0, 4, 4, 0]} name="Processos" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Gráfico de Crimes Mais Simulados */}
+          <div className="bg-white rounded-[12px] border border-gray-200 p-6 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+            <h3 className="text-lg font-semibold text-[#4F4F4F] mb-4">Crimes Mais Simulados</h3>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={crimeStats.crimesMaisSimulados.slice(0, 6)}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={true}
+                    label={({ tipoCrime, percentual }) => `${tipoCrime}: ${percentual.toFixed(1)}%`}
+                    outerRadius={100}
+                    fill="#8E44AD"
+                    dataKey="quantidade"
+                    nameKey="tipoCrime"
+                  >
+                    {crimeStats.crimesMaisSimulados.slice(0, 6).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={['#5DADE2', '#8E44AD', '#6FCF97', '#E57373', '#BFC9DE', '#A0A0A0'][index % 6]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1F2937', 
+                      border: 'none', 
+                      borderRadius: '8px',
+                      color: '#fff'
+                    }}
+                    formatter={(value: number, name: string) => [
+                      `${value} simulações`, 
+                      name === 'quantidade' ? 'Quantidade' : name
+                    ]}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Acesso Rápido e Actividades */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Acesso Rápido */}
         <div className="lg:col-span-2">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Acesso Rápido</h2>
@@ -311,9 +429,96 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Painel de Actualizações Legislativas e Jurisprudenciais */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Actualizações Legislativas */}
+        <div className="bg-white rounded-[12px] border border-gray-200 p-6 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-[#4F4F4F] flex items-center gap-2">
+              <BuildingLibraryIcon className="h-5 w-5 text-primary-600" />
+              Actualizações Legislativas
+            </h3>
+            <Link href="/legislacao" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+              Ver todas →
+            </Link>
+          </div>
+          <div className="space-y-3">
+            {loadingAtualizacoes ? (
+              <div className="flex items-center justify-center py-8">
+                <Spinner size="md" />
+              </div>
+            ) : atualizacoes.leis.length > 0 ? (
+              atualizacoes.leis.slice(0, 5).map((lei, idx) => (
+                <Link 
+                  key={lei.id || idx} 
+                  href={`/legislacao/${lei.id}`}
+                  className="block p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
+                >
+                  <p className="text-sm font-medium text-gray-900 truncate">{lei.titulo}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-primary-600 bg-primary-50 px-2 py-0.5 rounded">{lei.tipo}</span>
+                    <span className="text-xs text-gray-500">{lei.dataVigencia || lei.dataPublicacao}</span>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <BuildingLibraryIcon className="h-12 w-12 mx-auto text-gray-300 mb-2" />
+                <p className="text-sm">Nenhuma actualização legislativa recente</p>
+                <Link href="/legislacao/novo" className="text-sm text-primary-600 hover:underline mt-2 inline-block">
+                  Adicionar nova lei
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Actualizações Jurisprudenciais */}
+        <div className="bg-white rounded-[12px] border border-gray-200 p-6 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-[#4F4F4F] flex items-center gap-2">
+              <DocumentTextIcon className="h-5 w-5 text-primary-600" />
+              Actualizações Jurisprudenciais
+            </h3>
+            <Link href="/jurisprudencia" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+              Ver todas →
+            </Link>
+          </div>
+          <div className="space-y-3">
+            {loadingAtualizacoes ? (
+              <div className="flex items-center justify-center py-8">
+                <Spinner size="md" />
+              </div>
+            ) : atualizacoes.jurisprudencias.length > 0 ? (
+              atualizacoes.jurisprudencias.slice(0, 5).map((juris, idx) => (
+                <Link 
+                  key={juris.id || idx} 
+                  href={`/jurisprudencia/${juris.id}`}
+                  className="block p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
+                >
+                  <p className="text-sm font-medium text-gray-900 truncate">{juris.titulo}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded">{juris.numero}</span>
+                    <span className="text-xs text-gray-500">{juris.data}</span>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <DocumentTextIcon className="h-12 w-12 mx-auto text-gray-300 mb-2" />
+                <p className="text-sm">Nenhuma jurisprudência recente</p>
+                <Link href="/jurisprudencia" className="text-sm text-primary-600 hover:underline mt-2 inline-block">
+                  Consultar jurisprudência
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className="mt-8">
       {/* Card motivacional com ilustração */}
-        <div className="bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 rounded-2xl p-8 text-white relative overflow-hidden group hover:shadow-xl transition-all duration-300">
+        <div className="bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 rounded-lg p-8 text-white relative overflow-hidden group hover:shadow-xl transition-all duration-300">
           {/* Padrão decorativo angolano */}
           <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity">
             <AngolaPattern className="w-full h-full" />
@@ -332,7 +537,7 @@ export default function DashboardPage() {
                     <AngolaEmblem className="w-full h-full" />
                   </div>
                 </div>
-                <p className="text-primary-100 mb-6">
+                <p className="text-[#7A7A7A] mb-6">
                   O Sistema Penal de Angola trabalha para garantir uma justiça célere, 
                   transparente e acessível a todos os cidadãos.
                 </p>
@@ -340,17 +545,17 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-4">
                   <div className="text-center group/stat">
                     <p className="text-3xl font-bold group-hover/stat:scale-110 transition-transform">98%</p>
-                    <p className="text-xs text-primary-200">Satisfação</p>
+                    <p className="text-xs text-[#7A7A7A]">Satisfação</p>
                   </div>
                   <div className="w-px h-10 bg-white/20" />
                   <div className="text-center group/stat">
                     <p className="text-3xl font-bold group-hover/stat:scale-110 transition-transform">24h</p>
-                    <p className="text-xs text-primary-200">Resposta média</p>
+                    <p className="text-xs text-[#7A7A7A]">Resposta média</p>
                   </div>
                   <div className="w-px h-10 bg-white/20" />
                   <div className="text-center group/stat">
                     <p className="text-3xl font-bold group-hover/stat:scale-110 transition-transform">18</p>
-                    <p className="text-xs text-primary-200">Províncias</p>
+                    <p className="text-xs text-[#7A7A7A]">Províncias</p>
                   </div>
                 </div>
               </div>

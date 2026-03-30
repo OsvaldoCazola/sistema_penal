@@ -39,7 +39,7 @@ public class AuthService {
                 .nome(request.nome())
                 .email(request.email())
                 .senhaHash(passwordEncoder.encode(request.senha()))
-                .role(Usuario.Role.CIDADAO)
+                .role(Usuario.Role.ESTUDANTE)
                 .ativo(true)
                 .build();
 

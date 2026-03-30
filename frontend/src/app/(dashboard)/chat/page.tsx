@@ -12,6 +12,9 @@ import {
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, Button, Spinner, Badge } from '@/components/ui';
 import { chatService, ChatMessage } from '@/services/chat.service';
+import { useAuthStore } from '@/store/auth.store';
+import { Role } from '@/types';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 const EXEMPLOS_PERGUNTAS = [
@@ -28,6 +31,19 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [contextEnabled, setContextEnabled] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const { user } = useAuthStore();
+
+  // Verificar acesso - apenas JUIZ, PROCURADOR e ADVOGADO
+  useEffect(() => {
+    if (user && user.role !== Role.ADMIN && 
+        user.role !== Role.JUIZ && 
+        user.role !== Role.PROCURADOR && 
+        user.role !== Role.ADVOGADO) {
+      toast.error('Acesso restrito. Apenas profissionais jurídicos podem usar o assistente.');
+      router.push('/dashboard');
+    }
+  }, [user, router]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

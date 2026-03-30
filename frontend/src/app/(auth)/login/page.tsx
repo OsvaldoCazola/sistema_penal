@@ -43,23 +43,23 @@ export default function LoginPage() {
 
   return (
     <div className="relative">
-      {/* Barra decorativa com cores de Angola */}
-      <div className="flex h-1 rounded-full overflow-hidden mb-6">
-        <div className="flex-1 bg-[#CC092F]"></div>
-        <div className="flex-1 bg-black"></div>
-        <div className="flex-1 bg-[#FFCC00]"></div>
+      {/* Barra decorativa institucional */}
+      <div className="flex h-1 rounded-sm overflow-hidden mb-6">
+        <div className="flex-1 bg-primary-800"></div>
+        <div className="flex-1 bg-primary-600"></div>
+        <div className="flex-1 bg-primary-800"></div>
       </div>
 
       {/* Cabeçalho com emblema */}
       <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl shadow-lg shadow-primary-600/25 mb-3">
-          <ScaleIcon className="w-7 h-7 text-white" />
+        <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-900 rounded shadow-lg mb-3">
+          <ScaleIcon className="w-6 h-6 text-white" />
         </div>
-        <h2 className="text-xl font-bold text-gray-900 mb-1">
-          Bem-vindo de Volta
+        <h2 className="text-lg font-bold text-gray-900 mb-1">
+          Acesso ao Sistema
         </h2>
         <p className="text-sm text-gray-500">
-          Aceda ao Sistema Penal de Angola
+          Sistema Penal - República de Angola
         </p>
       </div>
 
@@ -71,16 +71,16 @@ export default function LoginPage() {
             Email institucional
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
               <EnvelopeIcon className="h-4 w-4" />
             </div>
             <input
               id="email"
               type="email"
               placeholder="exemplo@tribunal.gov.ao"
-              className={`block w-full pl-9 pr-3 py-2.5 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
+              className={`block w-full pl-9 pr-3 py-2.5 text-sm border rounded bg-white focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-primary-600 ${
                 errors.email 
-                  ? 'border-red-300 bg-red-50' 
+                  ? 'border-red-500 bg-red-50' 
                   : 'border-gray-300 hover:border-gray-400'
               }`}
               {...register('email')}
@@ -97,16 +97,16 @@ export default function LoginPage() {
             Senha
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
               <LockClosedIcon className="h-4 w-4" />
             </div>
             <input
               id="senha"
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
-              className={`block w-full pl-9 pr-10 py-2.5 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
+              className={`block w-full pl-9 pr-10 py-2.5 text-sm border rounded bg-white focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-primary-600 ${
                 errors.senha 
-                  ? 'border-red-300 bg-red-50' 
+                  ? 'border-red-500 bg-red-50' 
                   : 'border-gray-300 hover:border-gray-400'
               }`}
               {...register('senha')}
@@ -133,13 +133,13 @@ export default function LoginPage() {
           <label className="flex items-center gap-2 cursor-pointer">
             <input 
               type="checkbox" 
-              className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500" 
+              className="w-4 h-4 rounded border-gray-300 text-primary-700 focus:ring-primary-600" 
             />
             <span className="text-gray-600">Manter-me ligado</span>
           </label>
           <Link 
             href="/esqueci-senha" 
-            className="text-primary-600 hover:text-primary-700 font-medium hover:underline"
+            className="text-primary-700 hover:text-primary-800 font-medium hover:underline text-sm"
           >
             Esqueceu a senha?
           </Link>
@@ -148,7 +148,7 @@ export default function LoginPage() {
         {/* Botão de Login */}
         <Button 
           type="submit" 
-          className="w-full py-2.5 font-semibold bg-primary-600 hover:bg-primary-700 text-white rounded-lg shadow-md transition-colors" 
+          className="w-full py-2.5 font-semibold bg-primary-800 hover:bg-primary-900 text-white rounded shadow-sm" 
           size="lg" 
           isLoading={isLoading}
         >
@@ -160,7 +160,7 @@ export default function LoginPage() {
       </form>
 
       {/* Separador */}
-      <div className="relative my-6">
+      <div className="relative my-5">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-200" />
         </div>
@@ -172,14 +172,14 @@ export default function LoginPage() {
       {/* Link para registo */}
       <Link
         href="/register"
-        className="block w-full py-2.5 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg text-center text-sm hover:bg-gray-50 hover:border-gray-400 transition-colors"
+        className="block w-full py-2.5 px-4 border border-gray-300 text-gray-700 font-medium rounded text-center text-sm hover:bg-gray-50 hover:border-gray-400 transition-colors"
       >
         Criar Nova Conta
       </Link>
 
       {/* Informação adicional */}
-      <div className="mt-5 p-3 bg-primary-50 rounded-lg border-l-3 border-primary-500">
-        <p className="text-xs text-primary-800">
+      <div className="mt-5 p-3 bg-gray-50 rounded border-l-4 border-primary-700">
+        <p className="text-xs text-gray-600">
           <strong>Nota:</strong> Este sistema é de uso exclusivo para profissionais do sector judicial de Angola.
         </p>
       </div>

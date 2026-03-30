@@ -65,8 +65,9 @@ export default function BuscaJuridicaPage() {
       });
       setResultadoAnalise(response);
       toast.success('Análise concluída');
-    } catch (error) {
-      toast.error('Erro ao analisar caso');
+    } catch (error: any) {
+      const message = error.message || 'Erro ao analisar caso';
+      toast.error(message);
       console.error(error);
     } finally {
       setIsAnalisando(false);

@@ -52,6 +52,9 @@ public class Processo {
 
     private String fase;
 
+    @Column(name = "tipo_crime", length = 100)
+    private String tipoCrime;
+
     @Column(name = "data_abertura", nullable = false)
     private LocalDate dataAbertura;
 

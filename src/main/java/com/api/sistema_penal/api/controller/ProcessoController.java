@@ -90,14 +90,14 @@ public class ProcessoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO', 'JUIZ', 'PROCURADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'JUIZ', 'PROCURADOR')")
     @Operation(summary = "Criar processo")
     public ResponseEntity<ProcessoResponse> criar(@Valid @RequestBody ProcessoRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(request));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO', 'JUIZ')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'JUIZ')")
     @Operation(summary = "Atualizar processo")
     public ResponseEntity<ProcessoResponse> atualizar(
             @PathVariable UUID id,
@@ -130,7 +130,7 @@ public class ProcessoController {
     }
 
     @PostMapping("/{id}/movimentacoes")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO', 'JUIZ', 'PROCURADOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'JUIZ', 'PROCURADOR')")
     @Operation(summary = "Adicionar movimentação ao processo")
     public ResponseEntity<MovimentacaoResponse> adicionarMovimentacao(
             @PathVariable UUID id,

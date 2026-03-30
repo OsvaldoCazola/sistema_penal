@@ -49,7 +49,7 @@ public class LawMonitoringController {
     }
 
     @PostMapping("/adicionar")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Adicionar lei pendente (manual)")
     public ResponseEntity<LawUpdateResponse> adicionarLeiPendente(
             @Valid @RequestBody LawUpdateRequest request) {

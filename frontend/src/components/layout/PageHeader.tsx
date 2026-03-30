@@ -17,7 +17,9 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, breadcrumbs, actions, icon: Icon }: PageHeaderProps) {
   return (
-    <div className="mb-8">
+    <div className="mb-8 relative">
+      {/* Linha decorativa sutil */}
+      <div className="absolute -top-4 left-0 w-20 h-0.5 bg-gradient-to-r from-primary-600 to-primary-400 rounded-full" />
       {/* Breadcrumbs */}
       {breadcrumbs && breadcrumbs.length > 0 && (
         <nav className="flex items-center gap-1.5 text-sm mb-4">
@@ -43,7 +45,7 @@ export function PageHeader({ title, subtitle, breadcrumbs, actions, icon: Icon }
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">
           {Icon && (
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/30 flex-shrink-0">
+            <div className="w-12 h-12 rounded-sm bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/30 flex-shrink-0">
               <Icon className="h-6 w-6 text-white" />
             </div>
           )}

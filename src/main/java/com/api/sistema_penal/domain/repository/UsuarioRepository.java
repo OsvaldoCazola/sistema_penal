@@ -29,4 +29,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     long countByAtivoTrue();
 
     Page<Usuario> findByAtivoTrue(Pageable pageable);
+
+    // Query que busca usuário com permissões inicializadas (evita N+1)
+    @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.permissions WHERE u.id = :id")
+    Optional<Usuario> findByIdWithPermissions(@Param("id") UUID id);
 }

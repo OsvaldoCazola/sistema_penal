@@ -5,9 +5,11 @@ import com.api.sistema_penal.api.dto.busca.BuscaSemanticaResponse;
 import com.api.sistema_penal.service.BuscaSemanticaService;
 import com.api.sistema_penal.service.OpenAIService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.Map;
 @RequestMapping("/chat")
 @RequiredArgsConstructor
 @Tag(name = "Chat IA", description = "Assistente Jurídico com IA")
+@SecurityRequirement(name = "bearerAuth")
 public class ChatController {
 
     private final OpenAIService openAIService;
@@ -40,6 +43,7 @@ public class ChatController {
         """;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('JUIZ', 'PROCURADOR', 'ADVOGADO')")
     @Operation(summary = "Enviar mensagem ao assistente jurídico")
     public ResponseEntity<Map<String, Object>> chat(@RequestBody ChatRequest request) {
         try {

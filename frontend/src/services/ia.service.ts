@@ -92,38 +92,32 @@ export interface AnaliseCasoResponse {
 }
 
 export type CategoriaJuridica = 
-  | 'ADMINISTRATIVO'
-  | 'AMBIENTAL'
-  | 'CIVIL'
-  | 'COMERCIAL'
-  | 'CONSTITUCIONAL'
-  | 'CRIMINAL'
-  | 'ELEITORAL'
-  | 'FAMILIA'
-  | 'INTERNACIONAL'
-  | 'MILITAR'
-  | 'PREVIDENCIARIO'
-  | 'PROCESSUAL'
-  | 'SUCESSOES'
-  | 'TRABALHO'
-  | 'TRIBUTARIO';
+  | 'CRIMES_PESSOA'
+  | 'CRIMES_PATRIMONIO'
+  | 'CRIMES_HONRA'
+  | 'CRIMES_FAMILIA'
+  | 'CRIMES_SEXUAIS'
+  | 'CRIMES_SAUDE'
+  | 'CRIMES_ECONOMICOS'
+  | 'CRIMES_PUBLICOS'
+  | 'CRIMES_COMUN'
+  | 'CRIMES_ORGANIZADO'
+  | 'CRIMES_MILITARES'
+  | 'LEIS_PENAIS_ESPECIAIS';
 
 export const CATEGORIAS_JURIDICAS: { value: CategoriaJuridica; label: string }[] = [
-  { value: 'ADMINISTRATIVO', label: 'Direito Administrativo' },
-  { value: 'AMBIENTAL', label: 'Direito Ambiental' },
-  { value: 'CIVIL', label: 'Direito Civil' },
-  { value: 'COMERCIAL', label: 'Direito Comercial' },
-  { value: 'CONSTITUCIONAL', label: 'Direito Constitucional' },
-  { value: 'CRIMINAL', label: 'Direito Criminal' },
-  { value: 'ELEITORAL', label: 'Direito Eleitoral' },
-  { value: 'FAMILIA', label: 'Direito de Família' },
-  { value: 'INTERNACIONAL', label: 'Direito Internacional' },
-  { value: 'MILITAR', label: 'Direito Militar' },
-  { value: 'PREVIDENCIARIO', label: 'Direito Previdenciário' },
-  { value: 'PROCESSUAL', label: 'Direito Processual' },
-  { value: 'SUCESSOES', label: 'Direito das Sucessões' },
-  { value: 'TRABALHO', label: 'Direito do Trabalho' },
-  { value: 'TRIBUTARIO', label: 'Direito Tributário' },
+  { value: 'CRIMES_PESSOA', label: 'Crimes contra a Pessoa' },
+  { value: 'CRIMES_PATRIMONIO', label: 'Crimes contra o Património' },
+  { value: 'CRIMES_HONRA', label: 'Crimes contra a Honra' },
+  { value: 'CRIMES_FAMILIA', label: 'Crimes contra a Família' },
+  { value: 'CRIMES_SEXUAIS', label: 'Crimes Sexuais' },
+  { value: 'CRIMES_SAUDE', label: 'Crimes contra a Saúde Pública' },
+  { value: 'CRIMES_ECONOMICOS', label: 'Crimes Económicos e Financeiros' },
+  { value: 'CRIMES_PUBLICOS', label: 'Crimes contra a Administração Pública' },
+  { value: 'CRIMES_COMUN', label: 'Crimes de Perigo Comum' },
+  { value: 'CRIMES_ORGANIZADO', label: 'Criminalidade Organizada' },
+  { value: 'CRIMES_MILITARES', label: 'Crimes Militares' },
+  { value: 'LEIS_PENAIS_ESPECIAIS', label: 'Leis Penais Especiais' },
 ];
 
 // Tipos para Chat
@@ -201,8 +195,15 @@ class BuscaService {
   }
 
   async analisarCaso(request: AnaliseCasoRequest): Promise<AnaliseCasoResponse> {
-    const response = await api.post<AnaliseCasoResponse>('/busca/analisar-caso', request);
-    return response.data;
+    try {
+      const response = await api.post<AnaliseCasoResponse>('/busca/analisar-caso', request);
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        throw new Error('Sem permissão: Apenas JUIZ, PROCURADOR, ADVOGADO e ESTUDANTE (modo simulação) podem analisar casos');
+      }
+      throw error;
+    }
   }
 
   async getCategorias(): Promise<CategoriaJuridica[]> {

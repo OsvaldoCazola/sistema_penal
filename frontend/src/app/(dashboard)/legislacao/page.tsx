@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { 
   MagnifyingGlassIcon, 
   BookOpenIcon, 
@@ -12,7 +13,8 @@ import {
   BookmarkIcon,
   AdjustmentsHorizontalIcon,
   PlusIcon,
-  DocumentPlusIcon
+  DocumentPlusIcon,
+  ClockIcon
 } from '@heroicons/react/24/outline';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, Badge, Spinner, Button } from '@/components/ui';
@@ -21,12 +23,12 @@ import { formatDate, getStatusColor, formatStatus } from '@/lib/utils';
 import type { Lei, Page } from '@/types';
 
 const categorias = [
-  { id: '', label: 'Todos', icon: BookOpenIcon, cor: 'from-gray-600 to-gray-700' },
-  { id: 'LEI', label: 'Leis', icon: ScaleIcon, cor: 'from-blue-600 to-blue-700' },
-  { id: 'DECRETO', label: 'Decretos', icon: DocumentCheckIcon, cor: 'from-purple-600 to-purple-700' },
-  { id: 'DECRETO_LEI', label: 'Decretos-Lei', icon: BookmarkIcon, cor: 'from-indigo-600 to-indigo-700' },
-  { id: 'CONSTITUICAO', label: 'Constituição', icon: BuildingLibraryIcon, cor: 'from-red-700 to-yellow-600' },
-  { id: 'CODIGO', label: 'Códigos', icon: DocumentTextIcon, cor: 'from-emerald-600 to-emerald-700' },
+  { id: '', label: 'Todos', icon: BookOpenIcon, cor: 'from-primary-600 to-primary-700' },
+  { id: 'LEI', label: 'Leis', icon: ScaleIcon, cor: 'from-primary-600 to-primary-700' },
+  { id: 'DECRETO', label: 'Decretos', icon: DocumentCheckIcon, cor: 'from-primary-600 to-primary-700' },
+  { id: 'DECRETO_LEI', label: 'Decretos-Lei', icon: BookmarkIcon, cor: 'from-primary-600 to-primary-700' },
+  { id: 'CONSTITUICAO', label: 'Constituição', icon: BuildingLibraryIcon, cor: 'from-primary-600 to-primary-700' },
+  { id: 'CODIGO', label: 'Códigos', icon: DocumentTextIcon, cor: 'from-primary-600 to-primary-700' },
 ];
 
 export default function LegislacaoPage() {
@@ -78,38 +80,42 @@ export default function LegislacaoPage() {
 
       {/* Botão Nova Lei */}
       <div className="mb-4 flex justify-end gap-3">
-        <button
-          onClick={() => router.push('/legislacao/artigos/revisao')}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+        <Link
+          href="/legislacao/artigos/revisao"
         >
-          <DocumentCheckIcon className="h-5 w-5" />
-          Revisão Artigos
-        </button>
-        <button
-          onClick={() => router.push('/legislacao/revisao')}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
+          <Button variant="outline" size="sm">
+            <DocumentCheckIcon className="h-4 w-4" />
+            Revisão Artigos
+          </Button>
+        </Link>
+        <Link
+          href="/legislacao/revisao"
         >
-          <DocumentCheckIcon className="h-5 w-5" />
-          Revisão Leis
-        </button>
-        <button
-          onClick={() => router.push('/legislacao/artigos/novo')}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+          <Button variant="outline" size="sm">
+            <ClockIcon className="h-4 w-4" />
+            Revisão Leis
+          </Button>
+        </Link>
+        <Link
+          href="/legislacao/artigos/novo"
         >
-          <DocumentPlusIcon className="h-5 w-5" />
-          Novo Artigo
-        </button>
-        <button
-          onClick={() => router.push('/legislacao/novo')}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+          <Button variant="outline" size="sm">
+            <DocumentPlusIcon className="h-4 w-4" />
+            Novo Artigo
+          </Button>
+        </Link>
+        <Link
+          href="/legislacao/novo"
         >
-          <PlusIcon className="h-5 w-5" />
-          Nova Lei
-        </button>
+          <Button variant="outline" size="sm">
+            <PlusIcon className="h-4 w-4" />
+            Nova Lei
+          </Button>
+        </Link>
       </div>
 
       {/* Header decorativo com padrão angolano */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-gray-900 via-red-900 to-yellow-600 rounded-2xl p-6 mb-6">
+      <div className="relative overflow-hidden bg-primary-800 rounded-md p-6 mb-6">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full" 
             style={{
@@ -119,16 +125,16 @@ export default function LegislacaoPage() {
           />
         </div>
         <div className="relative flex items-center gap-4">
-          <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
-            <ScaleIcon className="h-8 w-8 text-yellow-300" />
+          <div className="p-3 bg-white/20 backdrop-blur-sm rounded-md">
+            <ScaleIcon className="h-8 w-8 text-white" />
           </div>
           <div>
             <h2 className="text-white font-bold text-xl">Biblioteca Jurídica</h2>
             <p className="text-white/70">Acesso completo à legislação penal angolana</p>
           </div>
           {data && (
-            <div className="ml-auto bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
-              <span className="text-yellow-300 font-bold text-2xl">{data.totalElements}</span>
+            <div className="ml-auto bg-white/10 backdrop-blur-sm rounded-md px-4 py-2">
+              <span className="text-white font-bold text-2xl">{data.totalElements}</span>
               <span className="text-white/70 text-sm ml-2">documentos</span>
             </div>
           )}
@@ -137,7 +143,7 @@ export default function LegislacaoPage() {
 
       {/* Barra de Pesquisa Melhorada */}
       <div className={`relative mb-6 transition-all duration-300 ${searchFocused ? 'transform scale-[1.01]' : ''}`}>
-        <div className={`bg-white rounded-2xl shadow-sm border-2 transition-all duration-300 ${
+        <div className={`bg-white rounded-md shadow-sm border-2 transition-all duration-300 ${
           searchFocused ? 'border-primary-400 shadow-lg shadow-primary-100' : 'border-gray-100'
         }`}>
           <div className="flex flex-col sm:flex-row gap-4 p-4">
@@ -152,7 +158,7 @@ export default function LegislacaoPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-0 focus:bg-white transition-all duration-300 text-gray-700 placeholder-gray-400"
+                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-md focus:ring-0 focus:bg-white transition-all duration-300 text-gray-700 placeholder-gray-400"
               />
               {search && (
                 <button
@@ -163,7 +169,7 @@ export default function LegislacaoPage() {
                 </button>
               )}
             </div>
-            <button className="flex items-center gap-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-gray-600">
+            <button className="flex items-center gap-2 px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors text-gray-600">
               <AdjustmentsHorizontalIcon className="h-5 w-5" />
               <span className="hidden sm:inline">Filtros</span>
             </button>
@@ -182,17 +188,17 @@ export default function LegislacaoPage() {
               <button
                 key={cat.id}
                 onClick={() => setTipoFilter(cat.id)}
-                className={`relative group p-4 rounded-xl border-2 transition-all duration-300 ${
+                className={`relative group p-4 rounded-md border-2 transition-all duration-300 ${
                   isActive 
                     ? 'border-transparent shadow-lg scale-105' 
                     : 'border-gray-100 hover:border-gray-200 hover:shadow-md'
                 }`}
               >
                 {isActive && (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${cat.cor} rounded-xl opacity-100`}></div>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${cat.cor} rounded-md opacity-100`}></div>
                 )}
                 <div className="relative flex flex-col items-center gap-2">
-                  <div className={`p-2 rounded-lg transition-colors ${
+                  <div className={`p-2 rounded-md transition-colors ${
                     isActive ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-gray-200'
                   }`}>
                     <Icon className={`h-5 w-5 transition-colors ${
@@ -215,7 +221,7 @@ export default function LegislacaoPage() {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-64 gap-4">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-red-500/20 to-yellow-500/20 rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute inset-0 bg-primary-100 rounded-full blur-xl animate-pulse"></div>
             <Spinner size="lg" />
           </div>
           <p className="text-gray-500 animate-pulse">A carregar legislação...</p>
@@ -228,15 +234,15 @@ export default function LegislacaoPage() {
               <div
                 key={lei.id}
                 onClick={() => router.push(`/legislacao/${lei.id}`)}
-                className="group bg-white rounded-2xl border border-gray-100 p-5 cursor-pointer hover:shadow-xl hover:border-gray-200 transition-all duration-300 hover:-translate-y-1"
+                className="group bg-white rounded-md border border-gray-200 p-5 cursor-pointer hover:shadow-md hover:border-gray-300 transition-all duration-300 hover:-translate-y-1"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex items-start gap-4">
                   {/* Ícone com gradiente */}
                   <div className="relative flex-shrink-0">
-                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/20 to-yellow-500/20 rounded-xl blur group-hover:blur-md transition-all"></div>
-                    <div className="relative p-3 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                      <BookOpenIcon className="h-6 w-6 text-yellow-400" />
+                    <div className="absolute inset-0 bg-primary-100 rounded-md blur-sm group-hover:blur-md transition-all"></div>
+                    <div className="relative p-3 bg-primary-50 rounded-md group-hover:scale-110 transition-transform duration-300">
+                      <BookOpenIcon className="h-6 w-6 text-primary-600" />
                     </div>
                   </div>
                   
@@ -305,7 +311,7 @@ export default function LegislacaoPage() {
       {/* Paginação */}
       {data && data.totalPages > 1 && (
         <div className="mt-8 flex justify-center">
-          <div className="flex items-center gap-2 bg-white rounded-xl shadow-sm border border-gray-100 p-2">
+          <div className="flex items-center gap-2 bg-white rounded-md shadow-sm border border-gray-200 p-2">
             <span className="px-3 py-2 text-sm text-gray-500">
               Página {data.number + 1} de {data.totalPages}
             </span>

@@ -113,7 +113,7 @@ public class LeiController {
     }
 
     @PostMapping("/importar")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Importar lei da internet para o banco local")
     public ResponseEntity<LeiResponse> importarLei(@RequestBody LeiRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(leiService.criar(request));
@@ -146,7 +146,7 @@ public class LeiController {
     }
 
     @PostMapping("/artigos/{artigoId}/elementos")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Adicionar elemento jurídico a um artigo")
     public ResponseEntity<ElementoJuridicoResponse> adicionarElementoJuridico(
             @PathVariable UUID artigoId,
@@ -171,7 +171,7 @@ public class LeiController {
     }
 
     @PostMapping("/artigos/{artigoId}/penalidades")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Adicionar penalidade a um artigo")
     public ResponseEntity<PenalidadeResponse> adicionarPenalidade(
             @PathVariable UUID artigoId,
@@ -196,7 +196,7 @@ public class LeiController {
     }
 
     @PostMapping("/categorias")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Criar categoria de crime")
     public ResponseEntity<CategoriaCrimeResponse> criarCategoria(
             @Valid @RequestBody CategoriaCrimeRequest request
@@ -205,7 +205,7 @@ public class LeiController {
     }
 
     @PostMapping("/artigos/{artigoId}/categorias/{categoriaId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Associar categoria a um artigo")
     public ResponseEntity<CategoriaCrimeResponse> adicionarArtigoCategoria(
             @PathVariable UUID artigoId,
@@ -216,14 +216,14 @@ public class LeiController {
 
     // CRUD básico de Leis
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Criar nova lei")
     public ResponseEntity<LeiResponse> criar(@Valid @RequestBody LeiRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(leiService.criar(request));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualizar lei")
     public ResponseEntity<LeiResponse> atualizar(
             @PathVariable UUID id,
@@ -244,7 +244,7 @@ public class LeiController {
     }
 
     @PostMapping("/{id}/artigos")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Adicionar artigo à lei")
     public ResponseEntity<ArtigoResponse> adicionarArtigo(
             @PathVariable UUID id,

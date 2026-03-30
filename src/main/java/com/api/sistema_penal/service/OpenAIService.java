@@ -18,19 +18,19 @@ import java.util.Map;
 @Service
 public class OpenAIService {
 
-    @Value("${spring.ai.openai.api-key:}")
+    @Value("${groq.api-key:}")
     private String apiKey;
 
-    @Value("${spring.ai.openai.chat.options.model:gpt-4}")
+    @Value("${groq.chat.options.model:llama-3.3-70b-versatile}")
     private String model;
 
-    @Value("${spring.ai.openai.chat.options.temperature:0.7}")
+    @Value("${groq.chat.options.temperature:0.7}")
     private double temperature;
 
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
-    private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+    private static final String OPENAI_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
     public OpenAIService() {
         this.objectMapper = new ObjectMapper();
@@ -45,7 +45,7 @@ public class OpenAIService {
 
     public String chat(String systemPrompt, String userMessage, String contexto) {
         if (!isConfigured()) {
-            log.warn("OpenAI API key não configurada");
+            log.warn("Groq API key não configurada");
             return null;
         }
 

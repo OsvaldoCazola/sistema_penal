@@ -18,8 +18,6 @@ import {
   ClockIcon,
   UserGroupIcon,
   BuildingLibraryIcon,
-  PlayCircleIcon,
-  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { JusticeIllustration, AngolaMap } from '@/components/illustrations';
 import { useAuthStore } from '@/store/auth.store';
@@ -36,11 +34,6 @@ const modulos = [
     icon: ScaleIcon,
     titulo: 'Simulador de Penas',
     descricao: 'Calcule estimativas de pena considerando agravantes, atenuantes e circunstâncias do caso.',
-  },
-  {
-    icon: MapIcon,
-    titulo: 'Mapa Criminal',
-    descricao: 'Visualize estatísticas de ocorrências por província e município em mapa interactivo de Angola.',
   },
   {
     icon: ChartBarIcon,
@@ -109,9 +102,48 @@ export default function LandingPage() {
     const carregarAtualizacoes = async () => {
       try {
         const result = await noticiaService.listarAtualizacoes(0, 3);
-        setAtualizacoes(result.content);
+        // Verificar se há dados reais ou usar fallback
+        if (result.content && result.content.length > 0) {
+          setAtualizacoes(result.content);
+        } else {
+          // Fallback: usar dados de exemplo quando não há dados no backend
+          setAtualizacoes([
+            {
+              id: '1',
+              tipo: 'NOVA_LEI' as const,
+              titulo: 'Nova Legislação Penal',
+              descricao: 'Em breve novas atualizações legislativas',
+              dataPublicacao: new Date().toISOString(),
+              tipoLabel: 'Nova Lei',
+              tipoIcon: 'document',
+              link: '/legislacao'
+            },
+            {
+              id: '2',
+              tipo: 'NOVA_JURISPRUDENCIA' as const,
+              titulo: 'Jurisprudência Atualizada',
+              descricao: 'Acompanhe as últimas decisões judiciais',
+              dataPublicacao: new Date().toISOString(),
+              tipoLabel: 'Jurisprudência',
+              tipoIcon: 'scale',
+              link: '/jurisprudencia'
+            },
+            {
+              id: '3',
+              tipo: 'ALTERACAO_ARTIGO' as const,
+              titulo: 'Alterações Legislativas',
+              descricao: 'Fique por dentro das mudanças na legislação',
+              dataPublicacao: new Date().toISOString(),
+              tipoLabel: 'Alteração',
+              tipoIcon: 'pencil',
+              link: '/legislacao/artigos'
+            }
+          ]);
+        }
       } catch (error) {
         console.error('Erro ao carregar atualizações:', error);
+        // Em caso de erro, mantém array vazio
+        setAtualizacoes([]);
       } finally {
         setLoadingAtualizacoes(false);
       }
@@ -122,6 +154,9 @@ export default function LandingPage() {
   // Função para ir para login, limpando qualquer sessão anterior
   const goToLogin = () => {
     clearAuth();
+    // Salvar a URL atual para redirecionar após login
+    const returnUrl = '/jurisprudencia';
+    localStorage.setItem('returnUrl', returnUrl);
     router.push('/login');
   };
 
@@ -136,20 +171,20 @@ export default function LandingPage() {
       {/* Header/Navegação */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'
+          scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary-700 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-700 to-primary-600 rounded flex items-center justify-center">
                 <ScaleIcon className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h1 className={`font-bold text-lg ${scrolled ? 'text-gray-900' : 'text-white'}`}>
                   Sistema Penal
                 </h1>
-                <p className={`text-xs ${scrolled ? 'text-gray-500' : 'text-gray-200'}`}>
+                <p className={`text-xs ${scrolled ? 'text-gray-500' : 'text-primary-400'}`}>
                   República de Angola
                 </p>
               </div>
@@ -159,7 +194,7 @@ export default function LandingPage() {
               <a
                 href="#modulos"
                 className={`text-sm font-medium transition-colors ${
-                  scrolled ? 'text-gray-600 hover:text-primary-600' : 'text-gray-100 hover:text-white'
+                  scrolled ? 'text-gray-600 hover:text-primary-700' : 'text-primary-400 hover:text-white'
                 }`}
               >
                 Funcionalidades
@@ -167,7 +202,7 @@ export default function LandingPage() {
               <a
                 href="#noticias"
                 className={`text-sm font-medium transition-colors ${
-                  scrolled ? 'text-gray-600 hover:text-primary-600' : 'text-gray-100 hover:text-white'
+                  scrolled ? 'text-gray-600 hover:text-primary-700' : 'text-primary-400 hover:text-white'
                 }`}
               >
                 Notícias
@@ -175,7 +210,7 @@ export default function LandingPage() {
               <a
                 href="#sobre"
                 className={`text-sm font-medium transition-colors ${
-                  scrolled ? 'text-gray-600 hover:text-primary-600' : 'text-gray-100 hover:text-white'
+                  scrolled ? 'text-gray-600 hover:text-primary-700' : 'text-primary-400 hover:text-white'
                 }`}
               >
                 Sobre
@@ -183,58 +218,58 @@ export default function LandingPage() {
             </nav>
 
             <div className="flex items-center gap-3">
-              {mounted && hasToken ? (
-                <Link
-                  href="/dashboard"
-                  className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-primary-600/30"
+              {/* Botão Ir para Dashboard removido - usuário será redirecionado automaticamente se estiver logado */}
+              <>
+                <button
+                  onClick={goToLogin}
+                  className={`px-4 py-2 text-sm font-medium rounded transition-colors ${
+                    scrolled
+                      ? 'text-gray-700 hover:bg-gray-100'
+                      : 'text-white hover:bg-white/10'
+                  }`}
                 >
-                  Ir para Dashboard
-                </Link>
-              ) : (
-                <>
-                  <button
-                    onClick={goToLogin}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      scrolled
-                        ? 'text-gray-700 hover:bg-gray-100'
-                        : 'text-white hover:bg-white/10'
-                    }`}
-                  >
-                    Entrar
-                  </button>
-                  <button
-                    onClick={goToRegister}
-                    className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-primary-600/30"
-                  >
-                    Criar Conta
-                  </button>
-                </>
-              )}
+                  Entrar
+                </button>
+                <button
+                  onClick={goToRegister}
+                  className="px-5 py-2 bg-gradient-to-r from-primary-700 to-primary-600 hover:from-primary-600 hover:to-primary-500 text-white text-sm font-medium rounded shadow-sm transition-colors"
+                >
+                  Criar Conta
+                </button>
+              </>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 overflow-hidden">
-        {/* Padrão decorativo */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-10 w-64 h-64 border border-white/30 rounded-full" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 border border-white/20 rounded-full" />
-          <div className="absolute top-40 right-40 w-32 h-32 border border-white/20 rounded-full" />
+      {/* Hero Section - Visual Formal */}
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+        {/* Imagem de fundo do Tribunal */}
+        <div className="absolute inset-0">
+          <Image
+            src="/images/tribunais/Tribunal-Supremo-novo.png"
+            alt="Tribunal Supremo de Angola"
+            fill
+            className="object-cover object-center"
+            priority
+          />
+          {/* Overlay com gradiente para legibilidade */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-900/95 via-primary-800/85 to-primary-700/80"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        {/* Padrão decorativo formal */}
+        <div className="absolute inset-0 bg-pattern opacity-10"></div>
+
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-white/90 text-sm mb-6">
+              <div className="flex items-center gap-2 text-white/80 text-sm mb-6">
                 <BellAlertIcon className="w-4 h-4" />
-                <span>Sistema oficial de gestão judicial</span>
+                <span>Sistema oficial do Ministério da Justiça</span>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-                Justiça Digital para{' '}
-                <span className="text-primary-300">Angola</span>
+                Gestão Judicial<br />
+                <span className="text-primary-400">para Angola</span>
               </h1>
 
               <p className="text-lg md:text-xl text-gray-200 mb-8 leading-relaxed">
@@ -246,76 +281,41 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <button
                   onClick={goToRegister}
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors shadow-xl"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-primary-700 to-primary-600 text-white font-semibold rounded hover:shadow-xl transition-all hover:scale-105"
                 >
                   Começar Agora
                   <ArrowRightIcon className="w-5 h-5" />
                 </button>
                 <a
                   href="#modulos"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 border-2 border-primary-400 text-white font-medium rounded hover:bg-primary-400/20 transition-colors"
                 >
                   Conhecer Funcionalidades
                 </a>
               </div>
 
-              <div className="flex items-center gap-6 text-gray-200">
+              <div className="flex items-center gap-6 text-gray-300">
                 <div className="flex items-center gap-2">
-                  <CheckCircleIcon className="w-5 h-5 text-green-400" />
+                  <CheckCircleIcon className="w-5 h-5 text-primary-400" />
                   <span className="text-sm">Gratuito para órgãos públicos</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircleIcon className="w-5 h-5 text-green-400" />
+                  <CheckCircleIcon className="w-5 h-5 text-primary-400" />
                   <span className="text-sm">Dados seguros</span>
                 </div>
               </div>
             </div>
-
-            {/* Ilustração/Card demonstrativo */}
-            <div className="hidden lg:block">
-              <div className="relative">
-                {/* Ilustração principal */}
-                <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
-                  <JusticeIllustration variant="hero" className="w-full max-w-md mx-auto opacity-90" />
-                </div>
-                
-                {/* Card flutuante - Processo */}
-                <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-5 shadow-2xl border border-gray-100 animate-fade-in">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center">
-                      <CheckCircleIcon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-gray-900">1.234</p>
-                      <p className="text-sm text-gray-500">Processos resolvidos</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card flutuante - Tempo */}
-                <div className="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-2xl border border-gray-100 animate-fade-in">
-                  <div className="flex items-center gap-2">
-                    <ClockIcon className="w-5 h-5 text-primary-500" />
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">Tempo médio</p>
-                      <p className="text-xs text-gray-500">45 dias por processo</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* Estatísticas */}
-      <section className="py-12 bg-gray-50 border-b border-gray-100">
+      <section className="py-10 bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {estatisticas.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-100 rounded-xl mb-3">
-                  <stat.icon className="w-6 h-6 text-primary-600" />
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-100 rounded mb-3">
+                  <stat.icon className="w-6 h-6 text-primary-800" />
                 </div>
                 <p className="text-3xl font-bold text-gray-900">{stat.numero}</p>
                 <p className="text-sm text-gray-500">{stat.label}</p>
@@ -326,28 +326,29 @@ export default function LandingPage() {
       </section>
 
       {/* Módulos/Funcionalidades */}
-      <section id="modulos" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="modulos" className="relative py-20 overflow-hidden bg-gray-50">
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Funcionalidades do Sistema
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Ferramentas desenvolvidas para facilitar o trabalho de profissionais do Direito, 
-              com interface intuitiva e adaptada ao contexto jurídico angolano.
+              com interface profissional e adaptada ao contexto jurídico angolano.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {modulos.map((modulo, index) => (
               <div
                 key={index}
-                className="group p-6 bg-white border border-gray-200 rounded-2xl hover:border-primary-300 hover:shadow-lg transition-all duration-300"
+                className="group p-5 bg-white border border-gray-200 rounded hover:border-primary-300 hover:shadow-md transition-all duration-200"
               >
-                <div className="w-12 h-12 bg-primary-50 group-hover:bg-primary-100 rounded-xl flex items-center justify-center mb-4 transition-colors">
-                  <modulo.icon className="w-6 h-6 text-primary-600" />
+                <div className="w-10 h-10 bg-primary-50 group-hover:bg-primary-100 rounded flex items-center justify-center mb-3 transition-colors">
+                  <modulo.icon className="w-5 h-5 text-primary-800" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{modulo.titulo}</h3>
+                <h3 className="text-base font-semibold text-gray-900 mb-2">{modulo.titulo}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{modulo.descricao}</p>
               </div>
             ))}
@@ -356,7 +357,7 @@ export default function LandingPage() {
           <div className="text-center mt-12">
             <button
               onClick={goToRegister}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-primary-600/30"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary-800 hover:bg-primary-900 text-white font-semibold rounded shadow-sm transition-colors"
             >
               Aceder ao Sistema
               <ArrowRightIcon className="w-5 h-5" />
@@ -379,10 +380,10 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             {loadingAtualizacoes ? (
               <div className="col-span-3 flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-800"></div>
               </div>
             ) : atualizacoes.length > 0 ? (
               atualizacoes.map((atualizacao) => (
@@ -395,16 +396,23 @@ export default function LandingPage() {
             )}
           </div>
           
-          {/* Link para todas as atualizações */}
+          {/* Link para todas as atualizações - salva returnUrl para redirecionar após login */}
           {atualizacoes.length > 0 && (
             <div className="text-center mt-8">
-              <Link
-                href="/jurisprudencia"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              <button
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    localStorage.setItem('returnUrl', '/jurisprudencia');
+                    router.push('/login');
+                  } else {
+                    router.push('/jurisprudencia');
+                  }
+                }}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary-800 text-white rounded hover:bg-primary-900 transition-colors"
               >
                 Ver todas as actualizações
                 <ArrowRightIcon className="w-5 h-5" />
-              </Link>
+              </button>
             </div>
           )}
         </div>
@@ -415,7 +423,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-primary-700 text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-50 rounded text-primary-800 text-sm font-medium mb-6">
                 <MapIcon className="w-4 h-4" />
                 <span>Cobertura Nacional</span>
               </div>
@@ -427,19 +435,19 @@ export default function LandingPage() {
                 unificada de processos judiciais desde Cabinda ao Cunene.
               </p>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { provincia: 'Luanda', processos: '45%', icon: '🏛️' },
                   { provincia: 'Benguela', processos: '12%', icon: '⚖️' },
                   { provincia: 'Huambo', processos: '8%', icon: '📋' },
                   { provincia: 'Huíla', processos: '7%', icon: '🔍' },
-                ].map((item, idx) => (
-                  <div key={idx} className="bg-gray-50 rounded-xl p-4 hover:bg-primary-50 transition-colors">
+                ].map((item: { provincia: string; processos: string; icon: string }, idx) => (
+                  <div key={idx} className="bg-gray-50 rounded p-3 hover:bg-primary-50 transition-colors">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">{item.icon}</span>
+                      <span className="text-xl">{item.icon}</span>
                       <div>
-                        <p className="font-semibold text-gray-900">{item.provincia}</p>
-                        <p className="text-sm text-gray-500">{item.processos} dos processos</p>
+                        <p className="font-semibold text-gray-900 text-sm">{item.provincia}</p>
+                        <p className="text-xs text-gray-500">{item.processos} dos processos</p>
                       </div>
                     </div>
                   </div>
@@ -451,39 +459,40 @@ export default function LandingPage() {
       </section>
 
       {/* Sobre/Para quem é */}
-      <section id="sobre" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="sobre" className="relative py-20 overflow-hidden bg-white">
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                 Desenvolvido para Profissionais do Direito em Angola
               </h2>
               <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                O Sistema Penal foi concebido com foco na simplicidade e eficiência, 
+                O Sistema Penal foi concebido com foco na eficiência e profissionalismo, 
                 permitindo que magistrados, advogados e estudantes concentrem-se no que 
                 realmente importa: fazer justiça.
               </p>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {[
                   { icon: UserGroupIcon, text: 'Magistrados e Juízes - Gestão completa de processos e decisões' },
                   { icon: BuildingLibraryIcon, text: 'Procuradores - Acompanhamento de denúncias e acusações' },
                   { icon: ScaleIcon, text: 'Advogados - Consulta de jurisprudência e legislação' },
                   { icon: AcademicCapIcon, text: 'Estudantes - Modo de estudo com casos práticos' },
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-primary-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-5 h-5 text-primary-600" />
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-primary-100 rounded flex items-center justify-center flex-shrink-0">
+                      <item.icon className="w-4 h-4 text-primary-800" />
                     </div>
-                    <p className="text-gray-700 pt-2">{item.text}</p>
+                    <p className="text-gray-700 pt-1">{item.text}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-3xl p-8">
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            <div className="bg-gray-50 rounded-lg p-8">
+              <div className="bg-white rounded p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
                   Pronto para começar?
                 </h3>
                 <p className="text-gray-600 mb-6">
@@ -491,14 +500,14 @@ export default function LandingPage() {
                 </p>
                 <button
                   onClick={goToRegister}
-                  className="block w-full py-4 bg-primary-600 hover:bg-primary-700 text-white text-center font-semibold rounded-xl transition-colors"
+                  className="block w-full py-3 bg-primary-800 hover:bg-primary-900 text-white text-center font-semibold rounded transition-colors"
                 >
                   Criar Conta Gratuita
                 </button>
                 <p className="text-center text-sm text-gray-500 mt-4">
                   Já tem conta?{' '}
-                  <button onClick={goToLogin} className="text-primary-600 hover:underline font-medium">
-                    Entrar
+                  <button onClick={goToLogin} className="text-primary-700 hover:underline font-medium">
+                    Faça login
                   </button>
                 </p>
               </div>
@@ -508,52 +517,37 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-                  <ScaleIcon className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-white">Sistema Penal</h4>
-                  <p className="text-xs">República de Angola</p>
-                </div>
+      <footer className="relative overflow-hidden">
+        {/* Gradiente institucional */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Barra decorativa */}
+          <div className="flex h-1 rounded-full overflow-hidden mb-8">
+            <div className="flex-1 bg-primary-800"></div>
+            <div className="flex-1 bg-primary-700"></div>
+            <div className="flex-1 bg-primary-600"></div>
+          </div>
+          
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded flex items-center justify-center">
+                <ScaleIcon className="w-6 h-6 text-white" />
               </div>
-              <p className="text-sm leading-relaxed max-w-md">
-                Plataforma oficial para gestão de processos judiciais penais, desenvolvida 
-                para modernizar e facilitar o acesso à justiça em Angola.
+              <div>
+                <p className="font-bold text-white">Sistema Penal</p>
+                <p className="text-white/70 text-sm">República de Angola</p>
+              </div>
+            </div>
+            
+            <div className="text-center md:text-right">
+              <p className="text-white/80 text-sm">
+                © {new Date().getFullYear()} Ministério da Justiça e dos Direitos Humanos
+              </p>
+              <p className="text-white/60 text-xs mt-1">
+                Todos os direitos reservados
               </p>
             </div>
-
-            <div>
-              <h5 className="font-semibold text-white mb-4">Acesso Rápido</h5>
-              <ul className="space-y-2 text-sm">
-                <li><button onClick={goToLogin} className="hover:text-white transition-colors">Entrar no Sistema</button></li>
-                <li><button onClick={goToRegister} className="hover:text-white transition-colors">Criar Conta</button></li>
-                <li><a href="#modulos" className="hover:text-white transition-colors">Funcionalidades</a></li>
-                <li><a href="#noticias" className="hover:text-white transition-colors">Notícias</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h5 className="font-semibold text-white mb-4">Contacto</h5>
-              <ul className="space-y-2 text-sm">
-                <li>Ministério da Justiça</li>
-                <li>Luanda, Angola</li>
-                <li>suporte@sistemapenal.gov.ao</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm">
-              © {new Date().getFullYear()} Sistema Penal. Todos os direitos reservados.
-            </p>
-            <p className="text-sm">
-              Desenvolvido para o Ministério da Justiça e dos Direitos Humanos
-            </p>
           </div>
         </div>
       </footer>

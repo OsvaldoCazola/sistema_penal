@@ -99,7 +99,7 @@ public class UsuarioController {
     @Operation(summary = "Criar novo usuário")
     public ResponseEntity<UsuarioResponse> criar(
             @Valid @RequestBody RegisterRequest request,
-            @RequestParam(defaultValue = "CIDADAO") Role role
+            @RequestParam(defaultValue = "ESTUDANTE") Role role
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(usuarioService.criar(request, role));
@@ -161,9 +161,7 @@ public class UsuarioController {
         return ResponseEntity.ok(Map.of(
                 "totalAtivos", usuarioService.contarAtivos(),
                 "admins", usuarioService.contarPorRole(Role.ADMIN),
-                "funcionarios", usuarioService.contarPorRole(Role.FUNCIONARIO),
-                "advogados", usuarioService.contarPorRole(Role.ADVOGADO),
-                "cidadaos", usuarioService.contarPorRole(Role.CIDADAO)
+                "advogados", usuarioService.contarPorRole(Role.ADVOGADO)
         ));
     }
 }

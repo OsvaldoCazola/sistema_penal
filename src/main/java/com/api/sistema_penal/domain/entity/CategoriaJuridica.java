@@ -5,18 +5,18 @@ package com.api.sistema_penal.domain.entity;
  * Usado para classificar leis, artigos e conhecimentos jurídicos
  */
 public enum CategoriaJuridica {
-    CRIMINAL("Criminal", "Direito Criminal"),
-    CIVIL("Civil", "Direito Civil"),
-    CONSTITUCIONAL("Constitucional", "Direito Constitucional"),
-    TRABALHO("Trabalho", "Direito do Trabalho"),
-    TRIBUTARIO("Tributário", "Direito Tributário"),
-    ADMINISTRATIVO("Administrativo", "Direito Administrativo"),
-    PROCESSUAL("Processual", "Direito Processual"),
-    FAMILIA("Família", "Direito de Família"),
-    AMBIENTAL("Ambiental", "Direito Ambiental"),
-    COMERCIAL("Comercial", "Direito Comercial"),
-    INTERNACIONAL("Internacional", "Direito Internacional"),
-    PENITENCIARIO("Penitenciário", "Direito Penitenciário");
+    CRIMES_PESSOA("Pessoa", "Crimes contra a Pessoa"),
+    CRIMES_PATRIMONIO("Património", "Crimes contra o Património"),
+    CRIMES_HONRA("Honra", "Crimes contra a Honra"),
+    CRIMES_FAMILIA("Família", "Crimes contra a Família"),
+    CRIMES_SEXUAIS("Sexuais", "Crimes Sexuais"),
+    CRIMES_SAUDE("Saúde", "Crimes contra a Saúde Pública"),
+    CRIMES_ECONOMICOS("Económicos", "Crimes Económicos e Financeiros"),
+    CRIMES_PUBLICOS("Públicos", "Crimes contra a Administração Pública"),
+    CRIMES_COMUN("Perigo Comum", "Crimes de Perigo Comum"),
+    CRIMES_ORGANIZADO("Organizado", "Criminalidade Organizada"),
+    CRIMES_MILITARES("Militares", "Crimes Militares"),
+    LEIS_PENAIS_ESPECIAIS("Especiais", "Leis Penais Especiais");
 
     private final String descricao;
     private final String nomeCompleto;

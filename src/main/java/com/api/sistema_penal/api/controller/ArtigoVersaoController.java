@@ -44,7 +44,7 @@ public class ArtigoVersaoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Registrar nova versão do artigo",
             description = "Cria uma nova versão do artigo quando houver alteração legislativa. " +
                     "A versão anterior é automaticamente encerrada.")

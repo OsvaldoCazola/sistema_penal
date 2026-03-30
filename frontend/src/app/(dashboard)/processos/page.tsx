@@ -83,36 +83,36 @@ export default function ProcessosPage() {
       title: 'Total de Processos',
       value: stats.total,
       icon: DocumentTextIcon,
-      gradient: 'from-blue-500 to-blue-600',
-      iconBg: 'bg-blue-400/30',
+      gradient: 'from-primary-600 to-primary-700',
+      iconBg: 'bg-primary-500/30',
     },
     {
       title: 'Em Andamento',
       value: stats.emAndamento,
       icon: ClockIcon,
-      gradient: 'from-amber-500 to-orange-500',
-      iconBg: 'bg-amber-400/30',
+      gradient: 'from-primary-600 to-primary-700',
+      iconBg: 'bg-primary-500/30',
     },
     {
       title: 'Em Julgamento',
       value: stats.emJulgamento,
       icon: ScaleIcon,
-      gradient: 'from-purple-500 to-purple-600',
-      iconBg: 'bg-purple-400/30',
+      gradient: 'from-primary-600 to-primary-700',
+      iconBg: 'bg-primary-500/30',
     },
     {
       title: 'Sentenciados',
       value: stats.sentenciados,
       icon: CheckCircleIcon,
-      gradient: 'from-emerald-500 to-green-600',
-      iconBg: 'bg-emerald-400/30',
+      gradient: 'from-primary-600 to-primary-700',
+      iconBg: 'bg-primary-500/30',
     },
     {
       title: 'Arquivados',
       value: stats.arquivados,
       icon: ArchiveBoxIcon,
-      gradient: 'from-gray-500 to-gray-600',
-      iconBg: 'bg-gray-400/30',
+      gradient: 'from-primary-600 to-primary-700',
+      iconBg: 'bg-primary-500/30',
     },
   ];
 
@@ -172,24 +172,24 @@ export default function ProcessosPage() {
         {statCards.map((stat, index) => (
           <div
             key={stat.title}
-            className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${stat.gradient} p-5 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02] cursor-default`}
+            className={`relative overflow-hidden rounded-md bg-white border border-gray-200 p-5 text-gray-900 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 cursor-default`}
             style={{ animationDelay: `${index * 100}ms` }}
           >
             {/* Padrão decorativo angolano sutil */}
-            <div className="absolute -right-2 -top-2 w-16 h-16 opacity-10">
+            <div className="absolute -right-2 -top-2 w-16 h-16 opacity-5">
               <svg viewBox="0 0 40 40">
-                <path d="M20 0 L40 20 L20 40 L0 20 Z" fill="white" />
-                <circle cx="20" cy="20" r="8" fill="white" opacity="0.5" />
+                <path d="M20 0 L40 20 L20 40 L0 20 Z" fill="#1F2937" />
+                <circle cx="20" cy="20" r="8" fill="#1F2937" opacity="0.5" />
               </svg>
             </div>
             
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-white/80">{stat.title}</p>
-                <p className="mt-1 text-3xl font-bold tracking-tight">{stat.value}</p>
+                <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                <p className="mt-1 text-3xl font-bold tracking-tight text-gray-900">{stat.value}</p>
               </div>
-              <div className={`${stat.iconBg} rounded-xl p-3`}>
-                <stat.icon className="h-7 w-7 text-white" />
+              <div className={`${stat.iconBg} rounded-md p-3`}>
+                <stat.icon className="h-7 w-7 text-primary-600" />
               </div>
             </div>
           </div>

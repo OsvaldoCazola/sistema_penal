@@ -4,10 +4,7 @@ export enum Role {
   JUIZ = 'JUIZ',
   PROCURADOR = 'PROCURADOR',
   ADVOGADO = 'ADVOGADO',
-  FUNCIONARIO = 'FUNCIONARIO',
-  PESQUISADOR = 'PESQUISADOR',
   ESTUDANTE = 'ESTUDANTE',
-  CIDADAO = 'CIDADAO',
 }
 
 export enum StatusProcesso {
@@ -255,6 +252,17 @@ export interface DashboardResponse {
   tendencias: {
     processosUltimos30Dias: Record<string, number>;
     denunciasUltimos30Dias: Record<string, number>;
+  };
+  estatisticasModulos?: {
+    totalLeis: number;
+    totalArtigos: number;
+    totalSimulacoes: number;
+    totalVerificacoes: number;
+    totalUsuarios: number;
+    crimesMaisSimulados: Record<string, number>;
+    artigosMaisUsados: Record<string, number>;
+    artigosMaisVerificados: Record<string, number>;
+    alertasPenas: number;
   };
 }
 

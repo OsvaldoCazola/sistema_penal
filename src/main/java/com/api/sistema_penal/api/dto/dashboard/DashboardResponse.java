@@ -9,7 +9,8 @@ public record DashboardResponse(
         Map<String, Long> denunciasPorStatus,
         Map<String, Long> denunciasPorProvincia,
         Map<String, Object> sentencasEstatisticas,
-        TendenciasResponse tendencias
+        TendenciasResponse tendencias,
+        EstatisticasModulos estatisticasModulos
 ) {
     public record ResumoGeral(
             long totalProcessos,
@@ -23,5 +24,17 @@ public record DashboardResponse(
     public record TendenciasResponse(
             Map<String, Long> processosUltimos30Dias,
             Map<String, Long> denunciasUltimos30Dias
+    ) {}
+
+    public record EstatisticasModulos(
+            long totalLeis,
+            long totalArtigos,
+            long totalSimulacoes,
+            long totalVerificacoes,
+            long totalUsuarios,
+            Map<String, Long> crimesMaisSimulados,
+            Map<String, Long> artigosMaisUsados,
+            Map<String, Long> artigosMaisVerificados,
+            long alertasPenas
     ) {}
 }

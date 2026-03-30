@@ -33,6 +33,14 @@ public class JwtService {
         return buildToken(extraClaims, usuario, jwtExpiration);
     }
 
+    public String generateRefreshToken(Usuario usuario) {
+        return buildToken(Map.of(), usuario, refreshExpiration);
+    }
+
+    public String extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", String.class));
+    }
+
     public long getExpirationTime() {
         return jwtExpiration;
     }
@@ -46,6 +54,7 @@ public class JwtService {
                 .claims(extraClaims)
                 .claim("role", usuario.getRole().name())
                 .claim("nome", usuario.getNome())
+                .claim("userId", usuario.getId().toString())
                 .subject(usuario.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))

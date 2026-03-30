@@ -14,8 +14,10 @@ import com.api.sistema_penal.domain.entity.CategoriaJuridica;
 import com.api.sistema_penal.domain.entity.Lei;
 import com.api.sistema_penal.domain.repository.AiExplanationsRepository;
 import com.api.sistema_penal.domain.repository.LeiRepository;
+import com.api.sistema_penal.service.OpenAIService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,8 @@ public class BuscaSemanticaService {
     private final LeiRepository leiRepository;
     private final BuscaOnlineService buscaOnlineService;
     private final AiExplanationsRepository aiExplanationsRepository;
+    @Autowired
+    private OpenAIService openAIService;
 
     // Dicionário de palavras-chave jurídicas em português
     // Mapeia palavras para seus tipos
@@ -143,8 +147,40 @@ public class BuscaSemanticaService {
         List<String> termosBusca = tokenizar(request.termo());
         Page<Lei> documentos = leiRepository.buscarPorTexto(request.termo(), PageRequest.of(0, 100));
         
+        // Se não encontrar resultados locais, buscar online (fallback)
         if (documentos.isEmpty()) {
+            log.info("Nenhum resultado local encontrado. Buscando online...");
+            List<Map<String, String>> onlineResults = buscaOnlineService.buscarLeisOnlineSimulado(
+                request.termo(), request.categoria() != null ? request.categoria().name() : null);
+            
+            if (!onlineResults.isEmpty()) {
+                // Converter resultados online para formato de resposta
+                List<ResultadoSimples> resultadosFinais = new ArrayList<>();
+                for (Map<String, String> result : onlineResults.subList(0, Math.min(onlineResults.size(), request.limite()))) {
+                    resultadosFinais.add(new ResultadoSimples(
+                        UUID.randomUUID(),
+                        result.get("titulo"),
+                        result.get("conteudo"),
+                        null,
+                        0.85,
+                        result.get("titulo")
+                    ));
+                }
+                return new ListaResultados(
+                    resultadosFinais,
+                    resultadosFinais.size(),
+                    request.termo(),
+                    request.categoria(),
+                    request.threshold()
+                );
+            }
+            
+            // Se ainda não encontrou, buscar todas as leis
             documentos = leiRepository.findAll(PageRequest.of(0, 100));
+        }
+        
+        if (documentos.isEmpty()) {
+            return new ListaResultados(new ArrayList<>(), 0, request.termo(), request.categoria(), request.threshold());
         }
         
         Map<String, Double> idf = calcularIDF(documentos.getContent());

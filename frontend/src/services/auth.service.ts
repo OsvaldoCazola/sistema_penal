@@ -25,4 +25,12 @@ export const authService = {
     const response = await api.get<Usuario>('/usuarios/me');
     return response.data;
   },
+
+  async changePassword(senhaAtual: string, novaSenha: string): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>('/usuarios/me/alterar-senha', {
+      senhaAtual,
+      novaSenha,
+    });
+    return response.data;
+  },
 };

@@ -5,3 +5,5 @@ export * from './ia.service';
 export * from './legislacao.service';
 export * from './monitoramento.service';
 export * from './artigo-monitoramento.service';
+export * from './simulador.service';
+export * from './verificador.service';

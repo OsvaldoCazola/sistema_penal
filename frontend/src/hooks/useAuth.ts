@@ -16,7 +16,10 @@ export function useAuth() {
       const response = await authService.login(data);
       setAuth(response.usuario, response.accessToken, response.refreshToken);
       toast.success('Login realizado com sucesso!');
-      router.push('/dashboard');
+      // Verificar se há uma URL de retorno salva
+      const returnUrl = localStorage.getItem('returnUrl');
+      localStorage.removeItem('returnUrl'); // Limpar após uso
+      router.push(returnUrl || '/dashboard');
     } catch (error: any) {
       const message = error.response?.data?.message || 'Erro ao fazer login';
       toast.error(message);
@@ -29,7 +32,10 @@ export function useAuth() {
       const response = await authService.register(data);
       setAuth(response.usuario, response.accessToken, response.refreshToken);
       toast.success('Conta criada com sucesso!');
-      router.push('/dashboard');
+      // Verificar se há uma URL de retorno salva
+      const returnUrl = localStorage.getItem('returnUrl');
+      localStorage.removeItem('returnUrl'); // Limpar após uso
+      router.push(returnUrl || '/dashboard');
     } catch (error: any) {
       const message = error.response?.data?.message || 'Erro ao criar conta';
       toast.error(message);
@@ -38,16 +44,23 @@ export function useAuth() {
   }, [setAuth, router]);
 
   const logout = useCallback(async () => {
+    const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
+
+    // Limpar estado local primeiro para garantir que o usuário seja desconectado imediatamente
+    clearAuth();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    }
+
     try {
-      const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken) {
         await authService.logout(refreshToken);
       }
     } catch (error) {
-      console.error('Erro no logout:', error);
+      console.error('Erro no logout API:', error);
     } finally {
-      clearAuth();
-      router.push('/login');
+      router.replace('/login');
       toast.success('Logout realizado com sucesso!');
     }
   }, [clearAuth, router]);

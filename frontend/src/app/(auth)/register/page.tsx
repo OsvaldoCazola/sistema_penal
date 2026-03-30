@@ -39,9 +39,7 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 const roleOptions = [
-  { value: Role.CIDADAO, label: 'Cidadão', descricao: 'Acesso básico para consultas e denúncias', icon: '👤' },
   { value: Role.ESTUDANTE, label: 'Estudante de Direito', descricao: 'Acesso ao modo de estudo e casos práticos', icon: '📚' },
-  { value: Role.PESQUISADOR, label: 'Pesquisador', descricao: 'Acesso a estatísticas e análises', icon: '🔬' },
   { value: Role.ADVOGADO, label: 'Advogado', descricao: 'Gestão de processos e consulta de jurisprudência', icon: '⚖️' },
 ];
 
@@ -50,13 +48,13 @@ export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role>(Role.CIDADAO);
+  const [selectedRole, setSelectedRole] = useState<Role>(Role.ESTUDANTE);
   const { register: registerUser } = useAuth();
   
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      role: Role.CIDADAO,
+      role: Role.ESTUDANTE,
     },
   });
 
@@ -91,6 +89,13 @@ export default function RegisterPage() {
 
   return (
     <div className="animate-in fade-in duration-500">
+      {/* Barra decorativa institucional */}
+      <div className="flex h-1 rounded-sm overflow-hidden mb-6">
+        <div className="flex-1 bg-primary-800"></div>
+        <div className="flex-1 bg-primary-600"></div>
+        <div className="flex-1 bg-primary-800"></div>
+      </div>
+
       {/* Cabeçalho com ícone decorativo */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-lg shadow-primary-500/30 mb-4 transform hover:scale-105 transition-transform">

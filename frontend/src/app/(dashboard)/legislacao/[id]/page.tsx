@@ -137,8 +137,8 @@ export default function LeiDetalhesPage() {
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl">
-                    <ScaleIcon className="h-6 w-6 text-yellow-400" />
+                  <div className="p-3 bg-primary-50 rounded-md">
+                    <ScaleIcon className="h-6 w-6 text-primary-600" />
                   </div>
                   <div>
                     <span className="inline-flex items-center px-3 py-1 rounded-lg bg-primary-50 text-primary-700 text-sm font-semibold">

@@ -49,7 +49,7 @@ public class ArticleMonitoringController {
     }
 
     @PostMapping("/adicionar")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FUNCIONARIO')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Adicionar artigo pendente (manual)")
     public ResponseEntity<ArtigoUpdateResponse> adicionarArtigoPendente(
             @Valid @RequestBody ArtigoUpdateRequest request) {
