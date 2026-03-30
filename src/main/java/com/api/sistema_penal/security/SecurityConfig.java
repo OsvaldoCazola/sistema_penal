@@ -68,8 +68,15 @@ public class SecurityConfig {
                         
                         // Protegidos por role
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/leis/**").hasAnyRole("ADMIN", "FUNCIONARIO")
-                        .requestMatchers(HttpMethod.PUT, "/leis/**").hasAnyRole("ADMIN", "FUNCIONARIO")
+                        // Permissões: apenas ADMIN pode gerenciar; listar todas as permissões é restrito a ADMIN
+                        .requestMatchers(HttpMethod.POST, "/api/permissions/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/permissions/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/permissions/**").hasRole("ADMIN")
+                        .requestMatchers("/api/permissions").hasRole("ADMIN")
+                        .requestMatchers("/api/permissions/usuario/*").hasRole("ADMIN")
+                        // POST /leis e similares para admin apenas
+                        .requestMatchers(HttpMethod.POST, "/leis/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/leis/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/leis/**").hasRole("ADMIN")
                         
                         // Qualquer autenticado

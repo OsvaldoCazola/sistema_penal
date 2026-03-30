@@ -59,10 +59,10 @@ Defina uma chave secreta forte para JWT:
 set JWT_SECRET=sua-chave-secreta-muito-longa-com-pelo-menos-256-bits
 ```
 
-### OpenAI API Key (para funcionalidades de IA)
+### Groq API Key (para funcionalidades de IA)
 
 ```bash
-set OPENAI_API_KEY=sk-sua-chave-openai
+set GROQ_API_KEY=gsk_sua-chave-groq
 ```
 
 ## 🚀 Executar a Aplicação
@@ -104,6 +104,20 @@ Após iniciar, acesse:
 | http://localhost:8080/api/actuator/health | Health Check |
 
 ## 🔐 Autenticação
+
+### Credenciais de Teste
+
+O sistema cria automaticamente 5 usuários de teste na primeira execução:
+
+| Role | Email | Senha | Permissões |
+|------|-------|-------|-------------|
+| ADMIN | admin@sistema.gov.ao | admin123 | Gestão técnica total |
+| JUIZ | juiz@tribunal.gov.ao | juiz123 | Decisões judiciais, sentenças |
+| PROCURADOR | prosecutor@ministeriopublico.gov.ao | prosecutor123 | Criação de processos |
+| ADVOGADO | advogado@oab.ao | advogado123 | Visualização de processos |
+| ESTUDANTE | estudante@universidade.ao | estudante123 | Leitura, busca |
+
+> ⚠️ **Aviso de Segurança**: Altere estas senhas em ambiente de produção!
 
 ### Registrar usuário
 
