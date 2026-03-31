@@ -34,12 +34,12 @@ export default function ChatPage() {
   const router = useRouter();
   const { user } = useAuthStore();
 
-  // Verificar acesso - apenas JUIZ, PROCURADOR e ADVOGADO
+  // Verificar acesso - conforme tabela de permissões
+  // JUIZ, PROCURADOR, ADVOGADO, ESTUDANTE podem acessar | ADMIN não pode (Chat é Assistente IA)
   useEffect(() => {
-    if (user && user.role !== Role.ADMIN && 
-        user.role !== Role.JUIZ && 
-        user.role !== Role.PROCURADOR && 
-        user.role !== Role.ADVOGADO) {
+    if (!user) return;
+    
+    if (user.role === Role.ADMIN) {
       toast.error('Acesso restrito. Apenas profissionais jurídicos podem usar o assistente.');
       router.push('/dashboard');
     }

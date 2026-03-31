@@ -8,6 +8,7 @@ import com.api.sistema_penal.domain.repository.UsuarioRepository;
 import com.api.sistema_penal.exception.BusinessException;
 import com.api.sistema_penal.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
@@ -35,11 +37,13 @@ public class AuthService {
             throw new BusinessException("Email já cadastrado");
         }
 
+        Usuario.Role roleUsuario = request.role() != null ? request.role() : Usuario.Role.ESTUDANTE;
+
         Usuario usuario = Usuario.builder()
                 .nome(request.nome())
                 .email(request.email())
                 .senhaHash(passwordEncoder.encode(request.senha()))
-                .role(Usuario.Role.ESTUDANTE)
+                .role(roleUsuario)
                 .ativo(true)
                 .build();
 

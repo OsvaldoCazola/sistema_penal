@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   ScaleIcon, 
   DocumentTextIcon,
@@ -108,8 +108,11 @@ export default function SimuladorPenalPage() {
 
   // Verificar acesso - ADMIN não pode usar simulador
   useEffect(() => {
-    if (user && user.role === Role.ADMIN) {
-      toast.error('Administradores não têm acesso ao simulador penal.');
+    // Early return se user não está carregado
+    if (!user) return;
+    
+    if (user.role === Role.ADMIN) {
+      toast.error('Administrador não pode acessar o simulador penal.');
       router.push('/dashboard');
     }
   }, [user, router]);

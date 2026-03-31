@@ -98,11 +98,10 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Criar novo usuário")
     public ResponseEntity<UsuarioResponse> criar(
-            @Valid @RequestBody RegisterRequest request,
-            @RequestParam(defaultValue = "ESTUDANTE") Role role
+            @Valid @RequestBody RegisterRequest request
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(usuarioService.criar(request, role));
+                .body(usuarioService.criar(request, request.role()));
     }
 
     // Endpoint removido para garantir que admin não possa editar usuários
@@ -113,7 +112,7 @@ public class UsuarioController {
     @Operation(summary = "Alterar role do usuário")
     public ResponseEntity<Map<String, String>> alterarRole(
             @PathVariable UUID id,
-            @RequestParam Role role
+            @RequestBody Role role
     ) {
         usuarioService.alterarRole(id, role);
         return ResponseEntity.ok(Map.of("message", "Role alterada para " + role));

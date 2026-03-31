@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   MagnifyingGlassIcon, 
   DocumentTextIcon, 
@@ -12,12 +12,17 @@ import {
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, Button, Spinner, Badge, Select } from '@/components/ui';
 import { buscaService, CATEGORIAS_JURIDICAS, type AnaliseCasoResponse, type BuscaResultado, CategoriaJuridica } from '@/services/ia.service';
+import { useAuthStore } from '@/store/auth.store';
+import { Role } from '@/types';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 type TabType = 'busca' | 'analise';
 
 export default function BuscaJuridicaPage() {
   const [activeTab, setActiveTab] = useState<TabType>('busca');
+  const router = useRouter();
+  const { user } = useAuthStore();
   
   // Busca state
   const [termoBusca, setTermoBusca] = useState('');
@@ -31,6 +36,16 @@ export default function BuscaJuridicaPage() {
   const [tipoCrime, setTipoCrime] = useState('');
   const [resultadoAnalise, setResultadoAnalise] = useState<AnaliseCasoResponse | null>(null);
   const [isAnalisando, setIsAnalisando] = useState(false);
+
+  // Verificar acesso - ADMIN não pode usar busca jurídica
+  useEffect(() => {
+    if (!user) return;
+    
+    if (user.role === Role.ADMIN) {
+      toast.error('Administrador não pode acessar a busca jurídica.');
+      router.push('/dashboard');
+    }
+  }, [user, router]);
 
   const handleBusca = async () => {
     if (!termoBusca.trim()) return;

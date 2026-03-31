@@ -14,7 +14,7 @@ import {
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button, Card, Input, Select, Spinner } from '@/components/ui';
 import { processoService } from '@/services/processo.service';
-import { tipoCrimeService, tribunalService } from '@/services/tribunal.service';
+import { tipoCrimeService } from '@/services/tribunal.service';
 import type { TipoCrime, Tribunal } from '@/types';
 
 // Províncias de Angola
@@ -66,7 +66,17 @@ export default function NovoProcessoPage() {
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [tiposCrime, setTiposCrime] = useState<TipoCrime[]>([]);
-  const [tribunais, setTribunais] = useState<Tribunal[]>([]);
+  // Tribunais de Angola - dados locais (endpoint /tribunais não existe no backend)
+  const [tribunais] = useState<Tribunal[]>([
+    { id: '1', nome: 'Supremo Tribunal de Angola', tipo: 'SUPREMO', provincia: 'Luanda' },
+    { id: '2', nome: 'Tribunal Superior de Apelação de Luanda', tipo: 'SEGUNDA_INSTANCIA', provincia: 'Luanda' },
+    { id: '3', nome: 'Tribunal de Primeira Instância de Luanda', tipo: 'PRIMEIRA_INSTANCIA', provincia: 'Luanda' },
+    { id: '4', nome: 'Tribunal de Primeira Instância de Benguela', tipo: 'PRIMEIRA_INSTANCIA', provincia: 'Benguela' },
+    { id: '5', nome: 'Tribunal de Primeira Instância do Huíla', tipo: 'PRIMEIRA_INSTANCIA', provincia: 'Huíla' },
+    { id: '6', nome: 'Tribunal de Primeira Instância de Namibe', tipo: 'PRIMEIRA_INSTANCIA', provincia: 'Namibe' },
+    { id: '7', nome: 'Tribunal de Primeira Instância da Lunda Sul', tipo: 'PRIMEIRA_INSTANCIA', provincia: 'Lunda Sul' },
+    { id: '8', nome: 'Tribunal de Primeira Instância do Cuanza Sul', tipo: 'PRIMEIRA_INSTANCIA', provincia: 'Cuanza Sul' },
+  ]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,12 +85,8 @@ export default function NovoProcessoPage() {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [tiposCrimeRes, tribunaisRes] = await Promise.all([
-        tipoCrimeService.listar(0, 100),
-        tribunalService.listar(0, 100),
-      ]);
+      const tiposCrimeRes = await tipoCrimeService.listar(0, 100);
       setTiposCrime(tiposCrimeRes.content || []);
-      setTribunais(tribunaisRes.content || []);
     } catch (err) {
       console.error('Erro ao carregar dados:', err);
       setError('Erro ao carregar dados necessários');

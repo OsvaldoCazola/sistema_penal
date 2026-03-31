@@ -39,8 +39,10 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 const roleOptions = [
-  { value: Role.ESTUDANTE, label: 'Estudante de Direito', descricao: 'Acesso ao modo de estudo e casos práticos', icon: '📚' },
+  { value: Role.JUIZ, label: 'Juiz', descricao: 'Gestão de processos, sentenças e jurisprudência', icon: '⚖️' },
+  { value: Role.PROCURADOR, label: 'Procurador', descricao: 'Ministério Público, investigação e acusações', icon: '🏛️' },
   { value: Role.ADVOGADO, label: 'Advogado', descricao: 'Gestão de processos e consulta de jurisprudência', icon: '⚖️' },
+  { value: Role.ESTUDANTE, label: 'Estudante de Direito', descricao: 'Acesso ao modo de estudo e casos práticos', icon: '📚' },
 ];
 
 export default function RegisterPage() {
@@ -48,13 +50,13 @@ export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role>(Role.ESTUDANTE);
+  const [selectedRole, setSelectedRole] = useState<Role>(Role.JUIZ);
   const { register: registerUser } = useAuth();
   
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      role: Role.ESTUDANTE,
+      role: Role.JUIZ,
     },
   });
 
@@ -71,12 +73,14 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     try {
-      await registerUser({
+      const registerData = {
         nome: data.nome,
         email: data.email,
         senha: data.senha,
-        role: data.role,
-      });
+        role: selectedRole,
+      };
+      
+      await registerUser(registerData);
     } finally {
       setIsLoading(false);
     }

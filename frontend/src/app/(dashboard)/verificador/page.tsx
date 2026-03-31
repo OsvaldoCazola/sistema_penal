@@ -54,9 +54,12 @@ export default function VerificadorPenasPage() {
     reparacaoDano: false,
   });
 
-  // Verificar acesso - apenas JUIZ, PROCURADOR e ADVOGADO (ADMIN não pode acessar)
+  // Verificar acesso - conforme tabela de permissões
+  // JUIZ, PROCURADOR, ADVOGADO podem acessar | ADMIN, ESTUDANTE não podem
   useEffect(() => {
-    if (user && (user.role === Role.ADMIN || user.role === Role.ESTUDANTE)) {
+    if (!user) return;
+    
+    if (user.role === Role.ADMIN || user.role === Role.ESTUDANTE) {
       toast.error('Acesso restrito. Apenas profissionais jurídicos qualificados podem usar o verificador.');
       router.push('/dashboard');
     }

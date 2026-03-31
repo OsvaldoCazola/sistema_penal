@@ -61,7 +61,7 @@ export interface RegisterRequest {
   email: string;
   senha: string;
   nome: string;
-  role?: Role;
+  role: Role;  // Agora é obrigatório
 }
 
 export interface TipoCrime {

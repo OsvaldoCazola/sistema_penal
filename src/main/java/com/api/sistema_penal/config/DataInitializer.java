@@ -96,11 +96,16 @@ public class DataInitializer implements CommandLineRunner {
     private void criarUsuariosDeTeste() {
         log.info("=== CRIANDO USUÁRIOS DE TESTE ===");
         
-        // Admin - acesso total técnico (sem decisões jurídicas)
+        // Credenciais via variáveis de ambiente (fallback para dev local)
+        String adminEmail = System.getenv("ADMIN_EMAIL") != null ? System.getenv("ADMIN_EMAIL") : "admin@sistema.gov.ao";
+        String adminSenha = System.getenv("ADMIN_PASSWORD") != null ? System.getenv("ADMIN_PASSWORD") : "admin123";
+        String adminNome = System.getenv("ADMIN_NAME") != null ? System.getenv("ADMIN_NAME") : "Administrador";
+        
+        // Admin - usuário principal
         criarUsuarioComPermissoes(
-            "admin@sistema.gov.ao", 
-            "admin123", 
-            "Administrador do Sistema", 
+            adminEmail, 
+            adminSenha, 
+            adminNome, 
             Usuario.Role.ADMIN,
             List.of(
                 // Gestão de Utilizadores
@@ -123,52 +128,60 @@ public class DataInitializer implements CommandLineRunner {
             )
         );
         
-        // Juiz
+        // Juiz - usuário de teste
         criarUsuarioComPermissoes(
             "juiz@tribunal.gov.ao", 
             "juiz123", 
             "Dr. João Manuel", 
             Usuario.Role.JUIZ,
-            List.of("JUIZ_PROCESSO_READ", "JUIZ_PROCESSO_UPDATE", "JUIZ_SENTENCA_CREATE", 
-                   "JUIZ_SENTENCA_READ", "JUIZ_SENTENCA_UPDATE", "JUIZ_LEI_READ",
-                   "JUIZ_ARTIGO_READ", "JUIZ_JURISPRUDENCIA_READ", "JUIZ_DASHBOARD_READ")
+            List.of(
+                "JUIZ_PROCESSO_READ", "JUIZ_PROCESSO_UPDATE", "JUIZ_SENTENCA_CREATE",
+                "JUIZ_SENTENCA_READ", "JUIZ_SENTENCA_UPDATE", "JUIZ_LEI_READ",
+                "JUIZ_ARTIGO_READ", "JUIZ_JURISPRUDENCIA_READ", "JUIZ_DASHBOARD_READ"
+            )
         );
         
-        // Procurador
+        // Procurador - usuário de teste
         criarUsuarioComPermissoes(
             "procurador@ministeriopublico.gov.ao", 
             "procurador123", 
             "Dr. Maria Sousa", 
             Usuario.Role.PROCURADOR,
-            List.of("PROCURADOR_PROCESSO_CREATE", "PROCURADOR_PROCESSO_READ",
-                   "PROCURADOR_LEI_READ", "PROCURADOR_ARTIGO_READ",
-                   "PROCURADOR_JURISPRUDENCIA_READ", "PROCURADOR_DASHBOARD_READ")
+            List.of(
+                "PROCURADOR_PROCESSO_CREATE", "PROCURADOR_PROCESSO_READ",
+                "PROCURADOR_LEI_READ", "PROCURADOR_ARTIGO_READ",
+                "PROCURADOR_JURISPRUDENCIA_READ", "PROCURADOR_DASHBOARD_READ"
+            )
         );
         
-        // Advogado
+        // Advogado - usuário de teste
         criarUsuarioComPermissoes(
             "advogado@oab.ao", 
             "advogado123", 
             "Dr. Carlos Alberto", 
             Usuario.Role.ADVOGADO,
-            List.of("ADVOGADO_PROCESSO_READ", "ADVOGADO_LEI_READ", 
-                   "ADVOGADO_ARTIGO_READ", "ADVOGADO_JURISPRUDENCIA_READ")
+            List.of(
+                "ADVOGADO_PROCESSO_READ", "ADVOGADO_LEI_READ", 
+                "ADVOGADO_ARTIGO_READ", "ADVOGADO_JURISPRUDENCIA_READ"
+            )
         );
         
-        // Estudante
+        // Estudante - usuário de teste
         criarUsuarioComPermissoes(
             "estudante@universidade.ao", 
             "estudante123", 
             "Pedro Silva", 
             Usuario.Role.ESTUDANTE,
-            List.of("ESTUDANTE_LEI_READ", "ESTUDANTE_ARTIGO_READ", 
-                   "ESTUDANTE_JURISPRUDENCIA_READ", "ESTUDANTE_BUSCA_EXECUTE")
+            List.of(
+                "ESTUDANTE_LEI_READ", "ESTUDANTE_ARTIGO_READ", 
+                "ESTUDANTE_JURISPRUDENCIA_READ", "ESTUDANTE_BUSCA_EXECUTE"
+            )
         );
         
         log.info("==============================================");
         log.info("| Role          | Email                             |");
         log.info("|---------------|-----------------------------------|");
-        log.info("| ADMIN        | admin@sistema.gov.ao             |");
+        log.info("| ADMIN        | {}            |", adminEmail);
         log.info("| JUIZ         | juiz@tribunal.gov.ao            |");
         log.info("| PROCURADOR   | prosecutor@ministeriopublico.gov.ao|");
         log.info("| ADVOGADO     | advogado@oab.ao                 |");
