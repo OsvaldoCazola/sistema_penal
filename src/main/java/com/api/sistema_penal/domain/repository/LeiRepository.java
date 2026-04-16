@@ -26,18 +26,10 @@ public interface LeiRepository extends JpaRepository<Lei, UUID> {
 
     Page<Lei> findByAno(Integer ano, Pageable pageable);
 
-    @Query(value = """
-            SELECT * FROM leis 
-            WHERE titulo LIKE CONCAT('%', :termo, '%') OR ementa LIKE CONCAT('%', :termo, '%') OR conteudo LIKE CONCAT('%', :termo, '%')
-            ORDER BY ano DESC, numero
-            """, nativeQuery = true)
+    @Query("SELECT l FROM Lei l WHERE l.titulo LIKE CONCAT('%', :termo, '%') OR l.ementa LIKE CONCAT('%', :termo, '%') OR l.conteudo LIKE CONCAT('%', :termo, '%') ORDER BY l.ano DESC, l.numero")
     Page<Lei> buscarPorTexto(@Param("termo") String termo, Pageable pageable);
 
-    @Query(value = """
-            SELECT * FROM leis 
-            WHERE titulo ILIKE CONCAT('%', :termo, '%') OR ementa ILIKE CONCAT('%', :termo, '%')
-            ORDER BY ano DESC, numero
-            """, nativeQuery = true)
+    @Query("SELECT l FROM Lei l WHERE l.titulo LIKE CONCAT('%', :termo, '%') OR l.ementa LIKE CONCAT('%', :termo, '%') ORDER BY l.ano DESC, l.numero")
     Page<Lei> buscarPorTituloOuEmenta(@Param("termo") String termo, Pageable pageable);
 
     @Query("SELECT DISTINCT l.tipo FROM Lei l ORDER BY l.tipo")

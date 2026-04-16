@@ -90,6 +90,9 @@ export default function LandingPage() {
   const [atualizacoes, setAtualizacoes] = useState<Atualizacao[]>([]);
   const [loadingAtualizacoes, setLoadingAtualizacoes] = useState(true);
 
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  const isLoggedIn = isAuthenticated && !!token;
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -396,17 +399,13 @@ export default function LandingPage() {
             )}
           </div>
           
-          {/* Link para todas as atualizações - salva returnUrl para redirecionar após login */}
+          {/* Link para todas as atualizações */}
           {atualizacoes.length > 0 && (
             <div className="text-center mt-8">
               <button
                 onClick={() => {
-                  if (!isAuthenticated) {
-                    localStorage.setItem('returnUrl', '/jurisprudencia');
-                    router.push('/login');
-                  } else {
-                    router.push('/jurisprudencia');
-                  }
+                  localStorage.setItem('returnUrl', '/jurisprudencia');
+                  router.push('/login');
                 }}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-primary-800 text-white rounded hover:bg-primary-900 transition-colors"
               >

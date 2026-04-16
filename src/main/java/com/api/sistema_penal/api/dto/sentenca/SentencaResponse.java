@@ -11,6 +11,7 @@ public record SentencaResponse(
         UUID id,
         String processoNumero,
         String tipoDecisao,
+        String tipoCrimeNome,
         Integer penaMeses,
         String tipoPena,
         String regime,
@@ -18,16 +19,23 @@ public record SentencaResponse(
         String ementa,
         String fundamentacao,
         String dispositivo,
+        String narrativa,
         String juizNome,
         Map<String, Object> circunstancias,
         Boolean transitadoJulgado,
         LocalDateTime createdAt
 ) {
     public static SentencaResponse from(Sentenca s) {
+        // Usa narrativa da sentença ou a descrição dos fatos do processo
+        String narrativa = s.getNarrativa();
+        if (narrativa == null || narrativa.isBlank()) {
+            narrativa = s.getProcesso() != null ? s.getProcesso().getDescricaoFatos() : null;
+        }
         return new SentencaResponse(
                 s.getId(),
                 s.getProcesso() != null ? s.getProcesso().getNumero() : null,
                 s.getTipoDecisao().name(),
+                s.getProcesso() != null ? s.getProcesso().getTipoCrime() : null,
                 s.getPenaMeses(),
                 s.getTipoPena(),
                 s.getRegime(),
@@ -35,6 +43,7 @@ public record SentencaResponse(
                 s.getEmenta(),
                 s.getFundamentacao(),
                 s.getDispositivo(),
+                narrativa,
                 s.getJuizNome(),
                 s.getCircunstancias(),
                 s.getTransitadoJulgado(),

@@ -29,6 +29,8 @@ public record SentencaRequest(
 
         String dispositivo,
 
+        String narrativa,
+
         String juizNome,
 
         Map<String, Object> circunstancias

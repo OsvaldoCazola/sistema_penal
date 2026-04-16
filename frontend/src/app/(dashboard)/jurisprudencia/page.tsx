@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/auth.store';
 import { 
   MagnifyingGlassIcon, 
   DocumentTextIcon, 
@@ -29,6 +31,22 @@ const TIPOS_DECISAO = [
 ];
 
 export default function JurisprudenciaPage() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  const isLoggedIn = isAuthenticated && !!token;
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      localStorage.setItem('returnUrl', '/jurisprudencia');
+      router.replace('/login');
+    }
+  }, [isLoggedIn, router]);
+
+  if (!isLoggedIn) {
+    return null;
+  }
+
   const [sentencas, setSentencas] = useState<Sentenca[]>([]);
   const [loading, setLoading] = useState(false);
   const [buscando, setBuscando] = useState(false);
@@ -282,9 +300,9 @@ export default function JurisprudenciaPage() {
                   {sentenca.tipoCrimeNome || 'Tipo de Crime não especificado'}
                 </h3>
                 
-                {sentenca.ementa && (
+                {(sentenca.ementa || sentenca.narrativa) && (
                   <p className="text-sm text-gray-600 line-clamp-2">
-                    {sentenca.ementa}
+                    {sentenca.narrativa || sentenca.ementa}
                   </p>
                 )}
                 
@@ -296,7 +314,7 @@ export default function JurisprudenciaPage() {
                     </div>
                   )}
                   {sentenca.penaMeses && (
-                    <span className="font-medium text-blue-600">
+                    <span className="font-medium text-blue-600 ml-auto">
                       {sentenca.penaMeses} meses de prisão
                     </span>
                   )}
@@ -380,6 +398,13 @@ export default function JurisprudenciaPage() {
                   <div>
                     <label className="text-sm font-medium text-gray-500">Fundamentação</label>
                     <p className="text-sm text-gray-700 mt-1">{selectedSentenca.fundamentacao}</p>
+                  </div>
+                )}
+
+                {selectedSentenca.narrativa && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Narrativa dos Factos</label>
+                    <p className="text-sm text-gray-700 mt-1 whitespace-pre-line">{selectedSentenca.narrativa}</p>
                   </div>
                 )}
 

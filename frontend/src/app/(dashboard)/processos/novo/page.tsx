@@ -85,8 +85,8 @@ export default function NovoProcessoPage() {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const tiposCrimeRes = await tipoCrimeService.listar(0, 100);
-      setTiposCrime(tiposCrimeRes.content || []);
+      const tiposCrimeRes = await tipoCrimeService.listar();
+      setTiposCrime(tiposCrimeRes || []);
     } catch (err) {
       console.error('Erro ao carregar dados:', err);
       setError('Erro ao carregar dados necessários');

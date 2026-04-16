@@ -45,7 +45,7 @@ public class SentencaService {
 
     @Transactional(readOnly = true)
     public Page<SentencaSummaryResponse> listarPorTipoCrime(UUID tipoCrimeId, Pageable pageable) {
-        // Funcionalidade não disponível - Processo não possui campo tipoCrime
+        // Funcionalidade n�o dispon�vel - Processo n�o possui campo tipoCrime
         return Page.empty(pageable);
     }
 
@@ -57,21 +57,21 @@ public class SentencaService {
     @Transactional(readOnly = true)
     public SentencaResponse buscarPorId(UUID id) {
         Sentenca sentenca = sentencaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sentença", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Senten�a", id));
         return SentencaResponse.from(sentenca);
     }
 
     @Transactional(readOnly = true)
     public SentencaResponse buscarPorProcesso(UUID processoId) {
         Sentenca sentenca = sentencaRepository.findByProcessoId(processoId)
-                .orElseThrow(() -> new ResourceNotFoundException("Sentença do processo " + processoId));
+                .orElseThrow(() -> new ResourceNotFoundException("Senten�a do processo " + processoId));
         return SentencaResponse.from(sentenca);
     }
 
     @Transactional
     public SentencaResponse criar(SentencaRequest request) {
         if (sentencaRepository.findByProcessoId(request.processoId()).isPresent()) {
-            throw new BusinessException("Processo já possui sentença");
+            throw new BusinessException("Processo j� possui senten�a");
         }
 
         Processo processo = processoRepository.findById(request.processoId())
@@ -87,6 +87,7 @@ public class SentencaService {
                 .ementa(request.ementa())
                 .fundamentacao(request.fundamentacao())
                 .dispositivo(request.dispositivo())
+                .narrativa(request.narrativa())
                 .juizNome(request.juizNome())
                 .circunstancias(request.circunstancias() != null ? request.circunstancias() : new HashMap<>())
                 .build();
@@ -100,7 +101,7 @@ public class SentencaService {
     @Transactional
     public SentencaResponse atualizar(UUID id, SentencaRequest request) {
         Sentenca sentenca = sentencaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sentença", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Senten�a", id));
 
         sentenca.setTipoDecisao(request.tipoDecisao());
         sentenca.setPenaMeses(request.penaMeses());
@@ -110,6 +111,7 @@ public class SentencaService {
         sentenca.setEmenta(request.ementa());
         sentenca.setFundamentacao(request.fundamentacao());
         sentenca.setDispositivo(request.dispositivo());
+        sentenca.setNarrativa(request.narrativa());
         sentenca.setJuizNome(request.juizNome());
         if (request.circunstancias() != null) {
             sentenca.setCircunstancias(request.circunstancias());
@@ -121,7 +123,7 @@ public class SentencaService {
     @Transactional
     public void marcarTransitadoJulgado(UUID id) {
         Sentenca sentenca = sentencaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sentença", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Senten�a", id));
         
         sentenca.setTransitadoJulgado(true);
         sentencaRepository.save(sentenca);
@@ -136,20 +138,28 @@ public class SentencaService {
     public Map<String, Object> estatisticas() {
         Map<String, Object> stats = new HashMap<>();
 
-        stats.put("porTipoDecisao", sentencaRepository.countByTipoDecisao().stream()
+        Map<String, Long> porTipoDecisao = sentencaRepository.countByTipoDecisao().stream()
                 .collect(Collectors.toMap(
                         arr -> ((TipoDecisao) arr[0]).name(),
-                        arr -> arr[1]
-                )));
+                        arr -> (Long) arr[1]
+                ));
 
+        stats.put("porTipoDecisao", porTipoDecisao);
         stats.put("total", sentencaRepository.count());
+        stats.put("condenacoes", porTipoDecisao.getOrDefault("CONDENACAO", 0L));
+        stats.put("absolicoes", porTipoDecisao.getOrDefault("ABSOLVICAO", 0L));
+
+        // Calcular m�dia de pena apenas para condamna��es
+        Double mediaPena = sentencaRepository.mediaPenaPorTipoDecisao(TipoDecisao.CONDENACAO);
+        stats.put("mediaPena", mediaPena != null ? mediaPena : 0.0);
 
         return stats;
     }
 
     @Transactional(readOnly = true)
     public Double mediaPenaPorTipoCrime(UUID tipoCrimeId) {
-        // Funcionalidade não disponível - Processo não possui campo tipoCrime
+        // Funcionalidade n�o dispon�vel - Processo n�o possui campo tipoCrime
         return null;
     }
 }
+

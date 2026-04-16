@@ -1,11 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { CalendarIcon, ArrowRightIcon, BookOpenIcon, ScaleIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import type { Atualizacao } from '@/services/noticia.service';
-import { useAuthStore } from '@/store/auth.store';
 
 interface AtualizacaoCardProps {
   atualizacao: Atualizacao;
@@ -70,7 +68,6 @@ const getColorsByTipo = (tipo: string) => {
 
 export default function AtualizacaoCard({ atualizacao }: AtualizacaoCardProps) {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
   const colors = getColorsByTipo(atualizacao.tipo);
   const icon = getIconByTipo(atualizacao.tipo);
 
@@ -83,19 +80,16 @@ export default function AtualizacaoCard({ atualizacao }: AtualizacaoCardProps) {
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    // Se não estiver autenticado, salvar returnUrl e redirecionar para login
-    if (!isAuthenticated) {
-      e.preventDefault();
-      localStorage.setItem('returnUrl', atualizacao.link);
-      router.push('/login');
-    }
+    e.preventDefault();
+    localStorage.setItem('returnUrl', atualizacao.link);
+    router.push('/login');
   };
 
   return (
-    <Link
-      href={atualizacao.link}
+    <a
+      href="#"
       onClick={handleClick}
-      className={`group block ${colors.bg} border ${colors.border} rounded-xl p-4 hover:shadow-md transition-all duration-200`}
+      className={`group block ${colors.bg} border ${colors.border} rounded-xl p-4 hover:shadow-md transition-all duration-200 cursor-pointer`}
     >
       <div className="flex items-start gap-3">
         {/* Ícone do tipo */}
@@ -132,7 +126,7 @@ export default function AtualizacaoCard({ atualizacao }: AtualizacaoCardProps) {
         {/* Setas de navegação */}
         <ArrowRightIcon className="h-4 w-4 text-gray-400 group-hover:text-primary-500 group-hover:translate-x-1 transition-all" />
       </div>
-    </Link>
+    </a>
   );
 }
 

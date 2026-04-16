@@ -2,12 +2,8 @@ import api from '@/lib/api';
 import { Page, TipoCrime, Tribunal } from '@/types';
 
 const tipoCrimeService = {
-  listar(page = 0, size = 100) {
-    const queryParams = new URLSearchParams();
-    queryParams.append('page', page.toString());
-    queryParams.append('size', size.toString());
-    
-    return api.get<Page<TipoCrime>>(`/tipos-crime?${queryParams.toString()}`).then(res => res.data);
+  listar() {
+    return api.get<TipoCrime[]>('/tipos-crime').then(res => res.data);
   },
 
   buscarPorId(id: string) {

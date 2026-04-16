@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 /**
  * Serviço de busca semântica usando TF-IDF para encontrar leis e artigos relacionados
- * Funciona com FALLBACK ONLINE quando não há resultados locais
+ * Pesquisa exclusivamente na base de dados local
  */
 @Slf4j
 @Service
@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 public class BuscaSemanticaService {
 
     private final LeiRepository leiRepository;
-    private final BuscaOnlineService buscaOnlineService;
     private final AiExplanationsRepository aiExplanationsRepository;
     @Autowired
     private OpenAIService openAIService;
@@ -147,35 +146,8 @@ public class BuscaSemanticaService {
         List<String> termosBusca = tokenizar(request.termo());
         Page<Lei> documentos = leiRepository.buscarPorTexto(request.termo(), PageRequest.of(0, 100));
         
-        // Se não encontrar resultados locais, buscar online (fallback)
+        // Se não encontrar resultados locais, buscar todas as leis
         if (documentos.isEmpty()) {
-            log.info("Nenhum resultado local encontrado. Buscando online...");
-            List<Map<String, String>> onlineResults = buscaOnlineService.buscarLeisOnlineSimulado(
-                request.termo(), request.categoria() != null ? request.categoria().name() : null);
-            
-            if (!onlineResults.isEmpty()) {
-                // Converter resultados online para formato de resposta
-                List<ResultadoSimples> resultadosFinais = new ArrayList<>();
-                for (Map<String, String> result : onlineResults.subList(0, Math.min(onlineResults.size(), request.limite()))) {
-                    resultadosFinais.add(new ResultadoSimples(
-                        UUID.randomUUID(),
-                        result.get("titulo"),
-                        result.get("conteudo"),
-                        null,
-                        0.85,
-                        result.get("titulo")
-                    ));
-                }
-                return new ListaResultados(
-                    resultadosFinais,
-                    resultadosFinais.size(),
-                    request.termo(),
-                    request.categoria(),
-                    request.threshold()
-                );
-            }
-            
-            // Se ainda não encontrou, buscar todas as leis
             documentos = leiRepository.findAll(PageRequest.of(0, 100));
         }
         
@@ -255,6 +227,7 @@ public class BuscaSemanticaService {
 
     /**
      * Analisa um caso e sugere leis aplicáveis
+     * Agora usa IA (Groq) para análise inteligente
      */
     public AnaliseCasoResponse analisarCaso(AnaliseCasoRequest request) {
         log.info("Analisando caso: {}", request.descricao());
@@ -268,36 +241,68 @@ public class BuscaSemanticaService {
         Page<Lei> documentos = leiRepository.buscarPorTexto(
             String.join(" ", termos), PageRequest.of(0, request.limite() * 2));
         
+        // Se não encontrar resultados específicos, buscar todas as leis
         if (documentos.isEmpty()) {
             documentos = leiRepository.findAll(PageRequest.of(0, request.limite()));
         }
         
+        // Se ainda não encontrou resultados locais, retorna resposta básica
         if (documentos.isEmpty()) {
-            log.info("Nenhum resultado local encontrado. Buscando online...");
-            List<Map<String, String>> onlineResults = buscaOnlineService.buscarLeisOnlineSimulado(
-                request.descricao(), request.tipoCrime());
-            
-            if (!onlineResults.isEmpty()) {
-                List<Lei> leisSimuladas = new ArrayList<>();
-                for (Map<String, String> result : onlineResults.subList(0, Math.min(onlineResults.size(), request.limite()))) {
-                    Lei leiSimulada = Lei.builder()
-                        .id(UUID.randomUUID())
-                        .tipo("Lei Online")
-                        .numero("1")
-                        .ano(2024)
-                        .titulo(result.get("titulo"))
-                        .ementa(result.get("conteudo"))
-                        .build();
-                    leisSimuladas.add(leiSimulada);
-                }
-                documentos = new org.springframework.data.domain.PageImpl<>(
-                    leisSimuladas.subList(0, Math.min(leisSimuladas.size(), request.limite())),
-                    PageRequest.of(0, request.limite()),
-                    onlineResults.size()
-                );
-            }
+            return AnaliseCasoResponse.builder()
+                .descricaoAnalisada(request.descricao())
+                .tipoCrime(request.tipoCrime())
+                .categoria(null)
+                .leisAplicaveis(new ArrayList<>())
+                .analise("Nenhuma lei encontrada na base de dados local para o caso descrito.")
+                .recomendacoes(new ArrayList<>())
+                .palavrasDetectadas(new ArrayList<>())
+                .mapeamentoPalavrasArtigos(new HashMap<>())
+                .build();
         }
         
+        // ========== ANÁLISE COM IA (Groq) ==========
+        String analiseIA = null;
+        if (openAIService.isConfigured()) {
+            try {
+                // Preparar contexto com as leis encontradas
+                StringBuilder contexto = new StringBuilder();
+                for (Lei lei : documentos.getContent()) {
+                    contexto.append("- ").append(lei.getTipo()).append(" ").append(lei.getNumero());
+                    if (lei.getAno() != null) contexto.append("/").append(lei.getAno());
+                    contexto.append(": ").append(lei.getEmenta() != null ? lei.getEmenta() : "");
+                    if (lei.getConteudo() != null) {
+                        contexto.append(" ").append(lei.getConteudo().substring(0, 
+                            Math.min(500, lei.getConteudo().length())));
+                    }
+                    contexto.append("\n");
+                }
+                
+                // Prompt para análise jurídica
+                String systemPrompt = """
+                    Você é um assistente jurídico especializado em direito angolano.
+                    Com base na descrição de um caso criminal e nas leis encontradas na base de dados,
+                    faça uma análise jurídica indicando:
+                    1. O tipo de crime identificado
+                    2. As circunstâncias agravantes e atenuantes
+                    3. As leis e artigos aplicáveis
+                    4. Uma análise da possível pena base
+                    
+                    Responda em português de forma clara e profissional.
+                    """;
+                
+                String userMessage = "Descrição do caso: " + request.descricao() + 
+                    "\n\nTipo de crime informado: " + (request.tipoCrime() != null ? request.tipoCrime() : "não informado");
+                
+                analiseIA = openAIService.chat(systemPrompt, userMessage, contexto.toString());
+                log.info("Análise IA gerada com sucesso");
+            } catch (Exception e) {
+                log.error("Erro ao gerar análise com IA: {}", e.getMessage());
+            }
+        } else {
+            log.warn("IA não configurada - usando análise baseada em TF-IDF");
+        }
+        
+        // ========== ANÁLISE TF-IDF (FALLBACK) ==========
         Map<String, Double> idf = calcularIDF(documentos.getContent());
         Map<String, Double> vetorBusca = calcularTFIDF(termos, idf, termos.size());
         
@@ -356,7 +361,8 @@ public class BuscaSemanticaService {
             })
             .collect(Collectors.toList());
         
-        String analise = gerarAnalise(request.descricao(), leisAplicaveis, palavrasDetectadas);
+        // Se temos análise da IA, usamos ela; caso contrário, geramos local
+        String analise = analiseIA != null ? analiseIA : gerarAnalise(request.descricao(), leisAplicaveis, palavrasDetectadas);
         List<String> recomendacoes = gerarRecomendacoes(leisAplicaveis);
         
         return AnaliseCasoResponse.builder()

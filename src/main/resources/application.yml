@@ -33,7 +33,7 @@ spring:
 
   # Groq API (LLM)
   groq:
-    api-key: ${GROQ_API_KEY}
+    api-key: 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
     chat:
       options:
         model: llama-3.3-70b-versatile

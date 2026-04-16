@@ -13,6 +13,7 @@ export interface Sentenca {
   ementa?: string;
   fundamentacao?: string;
   dispositivo?: string;
+  narrativa?: string;
   juizNome?: string;
   transitadoJulgado?: boolean;
   createdAt?: string;

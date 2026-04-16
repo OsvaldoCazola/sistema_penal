@@ -37,4 +37,7 @@ public interface SentencaRepository extends JpaRepository<Sentenca, UUID> {
     List<Object[]> countByTipoDecisao();
 
     List<Sentenca> findByDataSentencaBetween(LocalDate inicio, LocalDate fim);
+
+    @Query("SELECT AVG(s.penaMeses) FROM Sentenca s WHERE s.tipoDecisao = :tipoDecisao AND s.penaMeses IS NOT NULL")
+    Double mediaPenaPorTipoDecisao(@Param("tipoDecisao") TipoDecisao tipoDecisao);
 }

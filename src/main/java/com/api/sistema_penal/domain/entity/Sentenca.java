@@ -52,6 +52,9 @@ public class Sentenca {
     @Column(columnDefinition = "TEXT")
     private String dispositivo;
 
+    @Column(name = "narrativa", columnDefinition = "TEXT")
+    private String narrativa;
+
     @Column(name = "juiz_nome")
     private String juizNome;
 

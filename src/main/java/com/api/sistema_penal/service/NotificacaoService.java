@@ -3,6 +3,8 @@ package com.api.sistema_penal.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 /**
  * Serviço de notificações
  * Em produção, implementaria envio de emails, push notifications, etc.
@@ -10,6 +12,13 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class NotificacaoService {
+
+    /**
+     * Criar notificação para um usuário
+     */
+    public void criarNotificacao(UUID usuarioId, String titulo, String mensagem, String tipo) {
+        log.info("📢 NOTIFICAÇÃO para usuário {} - {}: {}", usuarioId, titulo, mensagem);
+    }
 
     /**
      * Notificar admin sobre novas leis pendentes

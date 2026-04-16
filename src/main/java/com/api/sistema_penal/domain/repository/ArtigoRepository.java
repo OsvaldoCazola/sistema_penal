@@ -19,18 +19,11 @@ public interface ArtigoRepository extends JpaRepository<Artigo, UUID> {
 
     Optional<Artigo> findByLeiIdAndNumero(UUID leiId, String numero);
 
-    @Query(value = """
-            SELECT * FROM artigos 
-            WHERE numero LIKE CONCAT('%', :termo, '%') OR conteudo LIKE CONCAT('%', :termo, '%')
-            ORDER BY ordem
-            """, nativeQuery = true)
+    Long countByLeiId(UUID leiId);
+
+    @Query("SELECT a FROM Artigo a WHERE a.numero LIKE CONCAT('%', :termo, '%') OR a.conteudo LIKE CONCAT('%', :termo, '%') ORDER BY a.ordem")
     Page<Artigo> buscarPorTexto(@Param("termo") String termo, Pageable pageable);
 
-    @Query(value = """
-            SELECT a.* FROM artigos a
-            JOIN leis l ON a.lei_id = l.id
-            WHERE a.conteudo ILIKE CONCAT('%', :termo, '%')
-            ORDER BY l.ano DESC, a.ordem
-            """, nativeQuery = true)
+    @Query("SELECT a FROM Artigo a JOIN Lei l ON a.lei.id = l.id WHERE a.conteudo LIKE CONCAT('%', :termo, '%') ORDER BY l.ano DESC, a.ordem")
     Page<Artigo> buscarPorConteudo(@Param("termo") String termo, Pageable pageable);
 }

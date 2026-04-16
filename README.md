@@ -7,7 +7,6 @@ Sistema Web Inteligente para Assistência na Aplicação do Direito Penal Angola
 - **Java 17+** 
 - **PostgreSQL 14+** com extensões:
   - `uuid-ossp`
-  - `postgis` (para dados geográficos)
   - `pg_trgm` (para busca fuzzy)
 - **Maven 3.8+** (ou use o wrapper `mvnw`)
 
@@ -25,7 +24,6 @@ CREATE DATABASE sistema_penal;
 \c sistema_penal
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "postgis";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 ```
 
@@ -170,27 +168,35 @@ src/main/java/com/api/sistema_penal/
 - **Autenticação**: JWT, refresh tokens, roles
 - **Legislação**: Leis, artigos, busca full-text
 - **Processos**: Gestão de processos judiciais
+- **Prazos**: Gestão de prazos processuais
 - **Sentenças**: Registro e análise de jurisprudência
-- **Denúncias**: Portal de denúncias anônimas
-- **Chat IA**: Assistente jurídico com OpenAI
-- **Previsões**: Análise preditiva de penas
-- **Mapa Criminal**: Visualização geográfica
-- **Relatórios**: Exportação de dados (CSV, JSON)
-- **Notificações**: Sistema de alertas
-- **Portal do Cidadão**: Conteúdos educativos
+- **Chat IA**: Assistente jurídico com OpenAI/Groq
+- **Simulador Penal**: Simulação de penas com IA
+- **Verificador de Penas**: Validação de penas
+- **Relatórios**: Exportação de dados (PDF, CSV)
+- **Monitoramento**: Acompanhamento de alterações legislativas
+- **Testes**: Unitários e de integração
 
-## 🐳 Docker (Opcional)
+## 🐳 Docker
 
 ```bash
-# Subir PostgreSQL com Docker
+# Compose completo (API + PostgreSQL + Frontend + Nginx)
+docker-compose up -d
+
+# Ou apenas PostgreSQL
 docker run -d \
   --name postgres-penal \
   -e POSTGRES_DB=sistema_penal \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=postgres \
   -p 5432:5432 \
-  postgis/postgis:14-3.2
+  postgres:14
 ```
+
+## 📄 Documentação
+
+- [API Documentation](API_DOCUMENTATION.md) - Documentação completa da API
+- [Swagger UI](http://localhost:8080/api/swagger-ui.html) - Documentação interativa
 
 ## 📝 Licença
 

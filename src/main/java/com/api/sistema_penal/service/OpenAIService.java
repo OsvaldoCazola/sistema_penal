@@ -40,7 +40,7 @@ public class OpenAIService {
     }
 
     public boolean isConfigured() {
-        return apiKey != null && !apiKey.isEmpty() && !apiKey.contains("sua-chave");
+        return apiKey != null && !apiKey.isEmpty() && !apiKey.isBlank() && !apiKey.equals("sua_chave_aqui");
     }
 
     public String chat(String systemPrompt, String userMessage, String contexto) {
