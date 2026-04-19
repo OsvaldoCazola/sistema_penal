@@ -1,24 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
-import { 
-  EnvelopeIcon, 
-  LockClosedIcon, 
-  EyeIcon, 
+import {
+  EnvelopeIcon,
+  LockClosedIcon,
+  EyeIcon,
   EyeSlashIcon,
   ScaleIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 
 const loginSchema = z.object({
-  email: z.string().email('Por favor, insira um email válido'),
+  email: z.string().email('Insira um email válido'),
   senha: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
 });
 
@@ -28,15 +27,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
-  const searchParams = useSearchParams();
 
-  useEffect(() => {
-    const returnUrlParam = searchParams.get('returnUrl');
-    if (returnUrlParam) {
-      localStorage.setItem('returnUrl', returnUrlParam);
-    }
-  }, [searchParams]);
-  
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
@@ -51,46 +42,34 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative">
-      {/* Barra decorativa institucional */}
-      <div className="flex h-1 rounded-sm overflow-hidden mb-6">
-        <div className="flex-1 bg-primary-800"></div>
-        <div className="flex-1 bg-primary-600"></div>
-        <div className="flex-1 bg-primary-800"></div>
-      </div>
-
-      {/* Cabeçalho com emblema */}
-      <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-900 rounded shadow-lg mb-3">
-          <ScaleIcon className="w-6 h-6 text-white" />
+    <>
+      {/* Cabeçalho */}
+      <div className="flex items-center gap-3 mb-7">
+        <div className="w-10 h-10 bg-[#1a2744] rounded-lg flex items-center justify-center flex-shrink-0">
+          <ScaleIcon className="w-5 h-5 text-white" />
         </div>
-        <h2 className="text-lg font-bold text-gray-900 mb-1">
-          Acesso ao Sistema
-        </h2>
-        <p className="text-sm text-gray-500">
-          Sistema Penal - República de Angola
-        </p>
+        <div>
+          <h1 className="text-base font-bold text-gray-900 leading-tight">Acesso ao Sistema</h1>
+          <p className="text-xs text-gray-400 leading-tight">Sistema Penal · República de Angola</p>
+        </div>
       </div>
 
       {/* Formulário */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Campo Email */}
+        {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="email" className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
             Email institucional
           </label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-              <EnvelopeIcon className="h-4 w-4" />
-            </div>
+            <EnvelopeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
             <input
               id="email"
               type="email"
-              placeholder="exemplo@tribunal.gov.ao"
-              className={`block w-full pl-9 pr-3 py-2.5 text-sm border rounded bg-white focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-primary-600 ${
-                errors.email 
-                  ? 'border-red-500 bg-red-50' 
-                  : 'border-gray-300 hover:border-gray-400'
+              placeholder="utilizador@tribunal.gov.ao"
+              autoComplete="email"
+              className={`block w-full pl-9 pr-3 py-2.5 text-sm border rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all ${
+                errors.email ? 'border-red-400 bg-red-50' : 'border-gray-200'
               }`}
               {...register('email')}
             />
@@ -100,36 +79,34 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Campo Senha */}
+        {/* Senha */}
         <div>
-          <label htmlFor="senha" className="block text-sm font-medium text-gray-700 mb-1">
-            Senha
-          </label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label htmlFor="senha" className="block text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              Senha
+            </label>
+            <Link href="/esqueci-senha" className="text-xs text-blue-600 hover:text-blue-800 font-medium">
+              Esqueceu?
+            </Link>
+          </div>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-              <LockClosedIcon className="h-4 w-4" />
-            </div>
+            <LockClosedIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
             <input
               id="senha"
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
-              className={`block w-full pl-9 pr-10 py-2.5 text-sm border rounded bg-white focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-primary-600 ${
-                errors.senha 
-                  ? 'border-red-500 bg-red-50' 
-                  : 'border-gray-300 hover:border-gray-400'
+              autoComplete="current-password"
+              className={`block w-full pl-9 pr-10 py-2.5 text-sm border rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all ${
+                errors.senha ? 'border-red-400 bg-red-50' : 'border-gray-200'
               }`}
               {...register('senha')}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
             >
-              {showPassword ? (
-                <EyeSlashIcon className="h-4 w-4" />
-              ) : (
-                <EyeIcon className="h-4 w-4" />
-              )}
+              {showPassword ? <EyeSlashIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
             </button>
           </div>
           {errors.senha && (
@@ -137,67 +114,68 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Opções */}
-        <div className="flex items-center justify-between text-sm">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input 
-              type="checkbox" 
-              className="w-4 h-4 rounded border-gray-300 text-primary-700 focus:ring-primary-600" 
-            />
-            <span className="text-gray-600">Manter-me ligado</span>
-          </label>
-          <Link 
-            href="/esqueci-senha" 
-            className="text-primary-700 hover:text-primary-800 font-medium hover:underline text-sm"
-          >
-            Esqueceu a senha?
-          </Link>
-        </div>
+        {/* Manter ligado */}
+        <label className="flex items-center gap-2.5 cursor-pointer">
+          <input
+            type="checkbox"
+            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm text-gray-600">Manter sessão activa</span>
+        </label>
 
-        {/* Botão de Login */}
-        <Button 
-          type="submit" 
-          className="w-full py-2.5 font-semibold bg-primary-800 hover:bg-primary-900 text-white rounded shadow-sm" 
-          size="lg" 
-          isLoading={isLoading}
+        {/* Botão */}
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[#1a2744] hover:bg-[#243561] text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <span className="flex items-center justify-center gap-2">
-            {!isLoading && <ShieldCheckIcon className="w-4 h-4" />}
-            Entrar no Sistema
-          </span>
-        </Button>
+          {isLoading ? (
+            <>
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              A autenticar...
+            </>
+          ) : (
+            <>
+              <ShieldCheckIcon className="h-4 w-4" />
+              Entrar no Sistema
+            </>
+          )}
+        </button>
       </form>
 
-      {/* Separador */}
+      {/* Divisor */}
       <div className="relative my-5">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200" />
+          <div className="w-full border-t border-gray-100" />
         </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="px-3 bg-white text-gray-500">Ainda não tem conta?</span>
+        <div className="relative flex justify-center">
+          <span className="px-3 bg-white text-xs text-gray-400">Sem conta?</span>
         </div>
       </div>
 
-      {/* Link para registo */}
+      {/* Registo */}
       <Link
         href="/register"
-        className="block w-full py-2.5 px-4 border border-gray-300 text-gray-700 font-medium rounded text-center text-sm hover:bg-gray-50 hover:border-gray-400 transition-colors"
+        className="block w-full py-2.5 px-4 text-center text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors"
       >
-        Criar Nova Conta
+        Solicitar acesso ao sistema
       </Link>
 
-      {/* Informação adicional */}
-      <div className="mt-5 p-3 bg-gray-50 rounded border-l-4 border-primary-700">
-        <p className="text-xs text-gray-600">
-          <strong>Nota:</strong> Este sistema é de uso exclusivo para profissionais do sector judicial de Angola.
+      {/* Nota institucional */}
+      <div className="mt-5 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+        <p className="text-xs text-blue-700 leading-relaxed">
+          <span className="font-semibold">Acesso restrito:</span> Este sistema destina-se exclusivamente a profissionais do sector judicial angolano credenciados.
         </p>
       </div>
 
-      {/* Badge de segurança */}
+      {/* Segurança */}
       <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-gray-400">
         <ShieldCheckIcon className="w-3.5 h-3.5" />
-        <span>Conexão segura • Dados encriptados</span>
+        <span>Ligação segura · Dados encriptados · SSL/TLS</span>
       </div>
-    </div>
+    </>
   );
 }

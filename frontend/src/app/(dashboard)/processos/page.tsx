@@ -2,24 +2,26 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  PlusIcon, 
-  MagnifyingGlassIcon, 
-  FunnelIcon,
+import Link from 'next/link';
+import {
+  PlusIcon,
+  MagnifyingGlassIcon,
   ScaleIcon,
   ClockIcon,
   CheckCircleIcon,
   ArchiveBoxIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  ArrowRightIcon,
+  FunnelIcon,
 } from '@heroicons/react/24/outline';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { Button, Card, Table, Pagination, Badge, Input, Select, Spinner } from '@/components/ui';
+import { Spinner } from '@/components/ui';
 import { processoService } from '@/services/processo.service';
-import { formatDate, getStatusColor, formatStatus } from '@/lib/utils';
+import { formatDate, formatStatus } from '@/lib/utils';
 import type { ProcessoSummary, StatusProcesso, Page } from '@/types';
 
 const statusOptions = [
-  { value: '', label: 'Todos os status' },
+  { value: '', label: 'Todos os estados' },
   { value: 'EM_ANDAMENTO', label: 'Em Andamento' },
   { value: 'AGUARDANDO_AUDIENCIA', label: 'Aguardando Audiência' },
   { value: 'EM_JULGAMENTO', label: 'Em Julgamento' },
@@ -27,13 +29,13 @@ const statusOptions = [
   { value: 'ARQUIVADO', label: 'Arquivado' },
 ];
 
-interface StatCard {
-  title: string;
-  value: number;
-  icon: React.ComponentType<{ className?: string }>;
-  gradient: string;
-  iconBg: string;
-}
+const statusStyles: Record<string, { bg: string; text: string; dot: string }> = {
+  EM_ANDAMENTO:          { bg: 'bg-blue-50',    text: 'text-blue-700',    dot: 'bg-blue-500' },
+  AGUARDANDO_AUDIENCIA:  { bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-500' },
+  EM_JULGAMENTO:         { bg: 'bg-purple-50',  text: 'text-purple-700',  dot: 'bg-purple-500' },
+  SENTENCIADO:           { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
+  ARQUIVADO:             { bg: 'bg-gray-100',   text: 'text-gray-500',    dot: 'bg-gray-400' },
+};
 
 export default function ProcessosPage() {
   const router = useRouter();
@@ -42,8 +44,6 @@ export default function ProcessosPage() {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -61,223 +61,178 @@ export default function ProcessosPage() {
     }
   }, [page, statusFilter]);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  useEffect(() => { loadData(); }, [loadData]);
 
   const stats = useMemo(() => {
     if (!data?.content) return { total: 0, emAndamento: 0, sentenciados: 0, arquivados: 0, emJulgamento: 0 };
-    
-    const content = data.content;
     return {
       total: data.totalElements || 0,
-      emAndamento: content.filter(p => p.status === 'EM_ANDAMENTO' || p.status === 'AGUARDANDO_AUDIENCIA').length,
-      sentenciados: content.filter(p => p.status === 'SENTENCIADO').length,
-      arquivados: content.filter(p => p.status === 'ARQUIVADO').length,
-      emJulgamento: content.filter(p => p.status === 'EM_JULGAMENTO').length,
+      emAndamento: data.content.filter(p => p.status === 'EM_ANDAMENTO' || p.status === 'AGUARDANDO_AUDIENCIA').length,
+      emJulgamento: data.content.filter(p => p.status === 'EM_JULGAMENTO').length,
+      sentenciados: data.content.filter(p => p.status === 'SENTENCIADO').length,
+      arquivados: data.content.filter(p => p.status === 'ARQUIVADO').length,
     };
   }, [data]);
 
-  const statCards: StatCard[] = [
-    {
-      title: 'Total de Processos',
-      value: stats.total,
-      icon: DocumentTextIcon,
-      gradient: 'from-primary-600 to-primary-700',
-      iconBg: 'bg-primary-500/30',
-    },
-    {
-      title: 'Em Andamento',
-      value: stats.emAndamento,
-      icon: ClockIcon,
-      gradient: 'from-primary-600 to-primary-700',
-      iconBg: 'bg-primary-500/30',
-    },
-    {
-      title: 'Em Julgamento',
-      value: stats.emJulgamento,
-      icon: ScaleIcon,
-      gradient: 'from-primary-600 to-primary-700',
-      iconBg: 'bg-primary-500/30',
-    },
-    {
-      title: 'Sentenciados',
-      value: stats.sentenciados,
-      icon: CheckCircleIcon,
-      gradient: 'from-primary-600 to-primary-700',
-      iconBg: 'bg-primary-500/30',
-    },
-    {
-      title: 'Arquivados',
-      value: stats.arquivados,
-      icon: ArchiveBoxIcon,
-      gradient: 'from-primary-600 to-primary-700',
-      iconBg: 'bg-primary-500/30',
-    },
+  const statCards = [
+    { title: 'Total de Processos', value: stats.total, icon: DocumentTextIcon, color: 'blue' },
+    { title: 'Em Andamento', value: stats.emAndamento, icon: ClockIcon, color: 'amber' },
+    { title: 'Em Julgamento', value: stats.emJulgamento, icon: ScaleIcon, color: 'purple' },
+    { title: 'Sentenciados', value: stats.sentenciados, icon: CheckCircleIcon, color: 'green' },
   ];
 
-  const columns = [
-    { key: 'numero', header: 'Número', render: (item: ProcessoSummary) => (
-      <span className="font-semibold text-primary-600 hover:text-primary-700 transition-colors">{item.numero}</span>
-    )},
-    { key: 'tipoCrimeNome', header: 'Tipo de Crime', render: (item: ProcessoSummary) => (
-      item.tipoCrimeNome || <span className="text-gray-400">-</span>
-    )},
-    { key: 'tribunalNome', header: 'Tribunal', render: (item: ProcessoSummary) => (
-      item.tribunalNome || <span className="text-gray-400">-</span>
-    )},
-    { key: 'provincia', header: 'Província' },
-    { key: 'status', header: 'Status', render: (item: ProcessoSummary) => (
-      <Badge className={`${getStatusColor(item.status)} transition-all duration-200 hover:scale-105`}>
-        {formatStatus(item.status)}
-      </Badge>
-    )},
-    { key: 'dataAbertura', header: 'Data Abertura', render: (item: ProcessoSummary) => (
-      formatDate(item.dataAbertura)
-    )},
-  ];
+  const palette: Record<string, { bar: string; icon: string; iconText: string }> = {
+    blue:   { bar: '#1D4ED8', icon: '#EFF6FF', iconText: '#1D4ED8' },
+    amber:  { bar: '#D97706', icon: '#FFFBEB', iconText: '#D97706' },
+    purple: { bar: '#7C3AED', icon: '#F5F3FF', iconText: '#7C3AED' },
+    green:  { bar: '#059669', icon: '#ECFDF5', iconText: '#059669' },
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Elemento decorativo angolano sutil */}
-      <div className="absolute top-0 right-0 w-64 h-64 opacity-[0.03] pointer-events-none overflow-hidden">
-        <svg viewBox="0 0 100 100" className="w-full h-full">
-          <pattern id="palanca" patternUnits="userSpaceOnUse" width="20" height="20">
-            <path d="M10 0 L20 10 L10 20 L0 10 Z" fill="currentColor" className="text-red-600" />
-          </pattern>
-          <circle cx="50" cy="50" r="45" fill="url(#palanca)" />
-        </svg>
-      </div>
-
+    <div className="space-y-5 pb-8">
       <PageHeader
-        title="Processos"
-        subtitle="Gestão de processos judiciais"
+        title="Gestão de Processos"
+        subtitle="Acompanhamento e gestão de processos judiciais"
+        icon={ScaleIcon}
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },
           { label: 'Processos' },
         ]}
         actions={
-          <Button 
-            onClick={() => router.push('/processos/novo')}
-            className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
-          >
-            <PlusIcon className="h-5 w-5" />
-            Novo Processo
-          </Button>
+          <Link href="/processos/novo">
+            <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-[#1a2744] rounded-lg hover:bg-[#243561] transition-colors">
+              <PlusIcon className="h-4 w-4" />
+              Novo Processo
+            </button>
+          </Link>
         }
       />
 
-      {/* Cards de Estatísticas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {statCards.map((stat, index) => (
-          <div
-            key={stat.title}
-            className={`relative overflow-hidden rounded-md bg-white border border-gray-200 p-5 text-gray-900 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 cursor-default`}
-            style={{ animationDelay: `${index * 100}ms` }}
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map((s) => {
+          const p = palette[s.color];
+          return (
+            <div key={s.title} className="bg-white rounded-xl border border-gray-100 p-5 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl" style={{ background: p.bar }} />
+              <div className="flex items-center gap-3 mt-1">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: p.icon }}>
+                  <s.icon className="h-4 w-4" style={{ color: p.iconText }} />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">{s.value}</p>
+                  <p className="text-xs text-gray-500">{s.title}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Filtros */}
+      <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Pesquisar processo..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          />
+        </div>
+        <div className="relative">
+          <FunnelIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="pl-9 pr-8 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer"
           >
-            {/* Padrão decorativo angolano sutil */}
-            <div className="absolute -right-2 -top-2 w-16 h-16 opacity-5">
-              <svg viewBox="0 0 40 40">
-                <path d="M20 0 L40 20 L20 40 L0 20 Z" fill="#1F2937" />
-                <circle cx="20" cy="20" r="8" fill="#1F2937" opacity="0.5" />
-              </svg>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                <p className="mt-1 text-3xl font-bold tracking-tight text-gray-900">{stat.value}</p>
-              </div>
-              <div className={`${stat.iconBg} rounded-md p-3`}>
-                <stat.icon className="h-7 w-7 text-primary-600" />
-              </div>
-            </div>
-          </div>
-        ))}
+            {statusOptions.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <Card padding="none" className="overflow-hidden shadow-lg border-0 ring-1 ring-gray-200/50">
-        {/* Barra de pesquisa moderna */}
-        <div className="p-5 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className={`flex-1 relative transition-all duration-300 ${searchFocused ? 'scale-[1.01]' : ''}`}>
-              <div className={`absolute inset-0 bg-gradient-to-r from-primary-500/20 to-primary-600/20 rounded-xl blur-xl transition-opacity duration-300 ${searchFocused ? 'opacity-100' : 'opacity-0'}`} />
-              <div className="relative">
-                <MagnifyingGlassIcon className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors duration-200 ${searchFocused ? 'text-primary-500' : 'text-gray-400'}`} />
-                <input
-                  type="text"
-                  placeholder="Buscar por número do processo..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onFocus={() => setSearchFocused(true)}
-                  onBlur={() => setSearchFocused(false)}
-                  className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-300 placeholder:text-gray-400 text-gray-700 shadow-sm hover:shadow-md"
-                />
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <Select
-                options={statusOptions}
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  setPage(0);
-                }}
-                className="w-52 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-300 hover:shadow-md"
-              />
-              <Button 
-                variant="outline" 
-                onClick={() => setShowFilters(!showFilters)}
-                className={`border-2 border-gray-200 hover:border-primary-500 hover:bg-primary-50 transition-all duration-300 ${showFilters ? 'bg-primary-50 border-primary-500 text-primary-600' : ''}`}
+      {/* Tabela */}
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center h-56 gap-3">
+          <Spinner size="lg" />
+          <p className="text-sm text-gray-400">A carregar processos...</p>
+        </div>
+      ) : data && data.content.length > 0 ? (
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div className="grid grid-cols-[1fr_140px_120px_130px_36px] gap-4 px-5 py-3 bg-gray-50 border-b border-gray-100">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Processo</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Réu</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Data</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Estado</p>
+            <div />
+          </div>
+
+          {data.content.map((proc) => {
+            const st = statusStyles[proc.status] ?? statusStyles.ARQUIVADO;
+            return (
+              <div
+                key={proc.id}
+                onClick={() => router.push(`/processos/${proc.id}`)}
+                className="grid grid-cols-[1fr_140px_120px_130px_36px] gap-4 items-center px-5 py-4 border-b border-gray-50 last:border-0 hover:bg-blue-50/30 cursor-pointer transition-colors group"
               >
-                <FunnelIcon className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-16 bg-gradient-to-b from-gray-50/50 to-white">
-            <Spinner size="lg" />
-            <p className="mt-4 text-sm text-gray-500 animate-pulse">A carregar processos...</p>
-          </div>
-        ) : (
-          <>
-            <div className="[&_table]:border-separate [&_table]:border-spacing-0 [&_tr]:transition-all [&_tr]:duration-200 [&_tbody_tr:hover]:bg-gradient-to-r [&_tbody_tr:hover]:from-primary-50/50 [&_tbody_tr:hover]:to-transparent [&_tbody_tr:hover]:shadow-sm [&_tbody_tr]:cursor-pointer">
-              <Table
-                columns={columns}
-                data={data?.content || []}
-                keyExtractor={(item) => item.id}
-                onRowClick={(item) => router.push(`/processos/${item.id}`)}
-                emptyMessage="Nenhum processo encontrado"
-              />
-            </div>
-            {data && data.totalPages > 1 && (
-              <div className="border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                <Pagination
-                  currentPage={data.number}
-                  totalPages={data.totalPages}
-                  totalElements={data.totalElements}
-                  onPageChange={setPage}
-                  isFirst={data.first}
-                  isLast={data.last}
-                />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-700 transition-colors truncate">
+                    {proc.numero}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5 truncate">{proc.tipoCrime}</p>
+                </div>
+                <p className="text-sm text-gray-600 truncate">{proc.nomeReu}</p>
+                <p className="text-xs text-gray-500">{proc.dataAbertura ? formatDate(proc.dataAbertura) : '—'}</p>
+                <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md w-fit ${st.bg} ${st.text}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
+                  {formatStatus(proc.status)}
+                </span>
+                <ArrowRightIcon className="h-4 w-4 text-gray-300 group-hover:text-blue-500 transition-colors" />
               </div>
-            )}
-          </>
-        )}
-      </Card>
-
-      {/* Marca sutil de Angola no rodapé */}
-      <div className="flex justify-center opacity-30 py-2">
-        <div className="flex items-center gap-2 text-xs text-gray-400">
-          <div className="w-4 h-3 rounded-sm overflow-hidden flex flex-col">
-            <div className="flex-1 bg-red-600" />
-            <div className="flex-1 bg-black" />
-          </div>
-          <span>Sistema de Gestão Processual Penal</span>
+            );
+          })}
         </div>
-      </div>
+      ) : (
+        <div className="bg-white rounded-xl border border-gray-100 flex flex-col items-center justify-center py-16 text-center">
+          <div className="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center mb-4">
+            <ScaleIcon className="h-7 w-7 text-gray-300" />
+          </div>
+          <h3 className="text-sm font-semibold text-gray-700 mb-1">Nenhum processo encontrado</h3>
+          <p className="text-xs text-gray-400 mb-5">Tente ajustar os filtros ou criar um novo processo.</p>
+          <Link href="/processos/novo">
+            <button className="text-xs font-semibold text-white bg-[#1a2744] px-4 py-2 rounded-lg hover:bg-[#243561] transition-colors">
+              Registar processo
+            </button>
+          </Link>
+        </div>
+      )}
+
+      {/* Paginação */}
+      {data && data.totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            disabled={page === 0}
+            className="text-xs font-medium px-3 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            ← Anterior
+          </button>
+          <span className="text-xs text-gray-500 bg-white border border-gray-200 rounded-lg px-4 py-2">
+            {page + 1} / {data.totalPages}
+          </span>
+          <button
+            onClick={() => setPage(p => Math.min(data.totalPages - 1, p + 1))}
+            disabled={page >= data.totalPages - 1}
+            className="text-xs font-medium px-3 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Seguinte →
+          </button>
+        </div>
+      )}
     </div>
   );
 }
